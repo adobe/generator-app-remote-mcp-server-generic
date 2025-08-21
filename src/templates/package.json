@@ -1,0 +1,47 @@
+{
+  "name": "<%= projectName %>",
+  "version": "1.0.0",
+  "description": "<%= description %>",
+  "main": "actions/mcp-server/index.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "build": "webpack",
+    "deploy": "npm run build && aio app deploy",
+    "undeploy": "aio app undeploy",
+    "dev": "aio app run",
+    "start": "node actions/mcp-server/index.js",
+    "lint": "eslint actions/",
+    "format": "prettier --write actions/"
+  },
+  "dependencies": {
+    "@adobe/aio-sdk": "^5.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "@babel/core": "^7.26.10",
+    "@babel/preset-env": "^7.26.9",
+    "babel-loader": "^9.2.1",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "eslint": "^8.57.0",
+    "prettier": "^3.0.0"
+  },
+  "keywords": [
+    "adobe-io",
+    "mcp",
+    "model-context-protocol",
+    "serverless",
+    "template",
+    "i/o-runtime"
+  ],
+  "engines": {
+    "node": ">=18.19.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git"
+  },
+  "license": "MIT",
+  "author": "<%= author %> <your.email@example.com>"
+}

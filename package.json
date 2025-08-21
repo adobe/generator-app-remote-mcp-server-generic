@@ -1,0 +1,60 @@
+{
+  "name": "@adobe/generator-app-remote-mcp-server-generic",
+  "version": "1.0.0",
+  "description": "Adobe I/O Runtime template for Model Context Protocol (MCP) server implementation with serverless actions",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "ecosystem:aio-app-builder-templates",
+    "aio-app-builder-template",
+    "mcp",
+    "model-context-protocol",
+    "adobe-io",
+    "runtime",
+    "serverless",
+    "yeoman-generator"
+  ],
+  "files": [
+    "src/",
+    "install.yml"
+  ],
+  "dependencies": {
+    "yeoman-generator": "^5",
+    "yeoman-environment": "^3"
+  },
+  "devDependencies": {
+    "@adobe/aio-lib-template-validation": "^5.0.0",
+    "@adobe/eslint-config-aio-lib-config": "^4.0.0",
+    "@types/jest": "^29.5.0",
+    "eslint": "^8.57.1",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jest": "^27.9.0",
+    "eslint-plugin-jsdoc": "^48.11.0",
+    "eslint-plugin-n": "^15.7.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.6.0",
+    "eslint-plugin-standard": "^5.0.0",
+    "fs-extra": "^10",
+    "jest": "^29",
+    "stdout-stderr": "^0.1.13",
+    "yeoman-assert": "^3.1.1",
+    "yeoman-environment": "^3.2.0",
+    "yeoman-test": "^6.0.0"
+  },
+  "scripts": {
+    "validate": "tv run-checks .",
+    "test": "npm run lint && npm run unit-tests && npm run validate",
+    "lint": "eslint .",
+    "unit-tests": "jest ./test",
+    "e2e": "node test/e2e.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adobe/generator-app-remote-mcp-server-generic.git"
+  },
+  "author": "Adobe Inc.",
+  "license": "Apache-2.0"
+}

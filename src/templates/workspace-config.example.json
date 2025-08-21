@@ -1,0 +1,38 @@
+{
+    "project": {
+        "org": {
+            "id": "YOUR_ORG_ID",
+            "name": "Your Organization Name",
+            "type": "enterprise"
+        },
+        "workspace": {
+            "id": "YOUR_WORKSPACE_ID",
+            "name": "Your Workspace Name"
+        }
+    },
+    "runtime": {
+        "namespace": "your-workspace-namespace",
+        "auth": "your-auth-token"
+    },
+    "credentials": {
+        "jwt": {
+            "client_id": "your-client-id",
+            "client_secret": "your-client-secret",
+            "jwt_payload": {
+                "iss": "your-org-id",
+                "sub": "your-technical-account-id",
+                "aud": "https://ims-na1.adobelogin.com/c/your-client-id"
+            },
+            "jwt_private_key": [
+                "-----BEGIN PRIVATE KEY-----",
+                "YOUR_PRIVATE_KEY_CONTENT_HERE",
+                "-----END PRIVATE KEY-----"
+            ]
+        }
+    },
+    "services": [
+        {
+            "code": "AdobeIOManagementAPISDK"
+        }
+    ]
+}

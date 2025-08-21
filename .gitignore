@@ -1,0 +1,28 @@
+
+# package directories
+node_modules
+
+.env*
+.aio
+
+# Test output
+junit.xml
+
+# IDE & Temp
+.cache
+.idea
+.nyc_output
+.vscode
+coverage
+
+# Parcel
+.parcel-cache
+
+# OSX
+.DS_Store
+
+# yeoman
+.yo-repository
+
+# this template's e2e test directory
+temp-template-test
