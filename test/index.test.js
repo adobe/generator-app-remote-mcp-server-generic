@@ -35,6 +35,7 @@ describe('MCP I/O Runtime Generator', () => {
       runResult.assertFile('.babelrc')
       runResult.assertFile('test/jest.setup.js')
       runResult.assertFile('test/mcp-server.test.js')
+      runResult.assertFile('test/utils.test.js') // Added utils test from commonTemplates
       runResult.assertFile('workspace-config.example.json')
     })
 
