@@ -10,8 +10,8 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const Generator = require('yeoman-generator')
 const path = require('path')
+const { ActionGenerator, commonTemplates } = require('@adobe/generator-app-common-lib')
 
 /*
  * Adobe I/O Runtime MCP Server Template Generator
@@ -27,8 +27,13 @@ const path = require('path')
  * - end
  */
 
-class McpIoRuntimeGenerator extends Generator {
+class McpIoRuntimeGenerator extends ActionGenerator {
   constructor (args, opts) {
+    // Add required options for ActionGenerator before calling super
+    opts = opts || {}
+    opts['action-folder'] = opts['action-folder'] || 'actions'
+    opts['config-path'] = opts['config-path'] || 'app.config.yaml'
+    opts['full-key-to-manifest'] = opts['full-key-to-manifest'] || 'application.runtimeManifest'
     super(args, opts)
 
     // options are inputs from CLI or yeoman parent generator
@@ -168,7 +173,10 @@ class McpIoRuntimeGenerator extends Generator {
     // Copy template files with template processing
     const templateProps = {
       ...this.props,
-      projectName: this.props.normalizedProjectName
+      projectName: this.props.normalizedProjectName || this.props.projectName,
+      description: this.props.description || 'Model Context Protocol server with Adobe I/O Runtime',
+      author: this.props.author || 'Your Name',
+      utilsRelPath: '../actions/utils' // Required by commonTemplates.utils.test
     }
 
     // Copy main template files
@@ -184,7 +192,6 @@ class McpIoRuntimeGenerator extends Generator {
       '.babelrc',
       'actions/mcp-server/index.js',
       'actions/mcp-server/webpack.config.js',
-      'actions/utils.js',
       'test/jest.setup.js',
       'test/mcp-server.test.js',
       'workspace-config.example.json'
@@ -197,6 +204,20 @@ class McpIoRuntimeGenerator extends Generator {
         templateProps
       )
     })
+
+    // Use commonTemplates for standardized Adobe I/O Runtime utilities
+    this.fs.copyTpl(
+      commonTemplates.utils,
+      this.destinationPath(path.join(destFolder, 'actions/utils.js')),
+      templateProps
+    )
+
+    // Use commonTemplates for utility tests
+    this.fs.copyTpl(
+      commonTemplates['utils.test'],
+      this.destinationPath(path.join(destFolder, 'test/utils.test.js')),
+      templateProps
+    )
 
     // Copy .gitignore file (renamed from _dot.gitignore to avoid npm pack issues)
     this.fs.copyTpl(
