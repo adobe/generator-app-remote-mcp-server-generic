@@ -1,6 +1,6 @@
 /**
  * Test suite for MCP Server Template
- * 
+ *
  * This file contains basic tests to verify your MCP server functionality.
  * Add more tests as you customize your server with new tools and features.
  */
@@ -21,7 +21,7 @@ describe('MCP Server Template Tests', () => {
 
             expect(result.statusCode).toBe(200)
             expect(result.headers['Content-Type']).toBe('application/json')
-            
+
             const body = JSON.parse(result.body)
             expect(body.status).toBe('healthy')
             expect(body.server).toBe('<%= projectName %>')
@@ -71,7 +71,7 @@ describe('MCP Server Template Tests', () => {
             const result = await main(params)
 
             expect(result.statusCode).toBe(200)
-            
+
             const body = JSON.parse(result.body)
             expect(body.jsonrpc).toBe('2.0')
             expect(body.id).toBe(1)
@@ -96,13 +96,13 @@ describe('MCP Server Template Tests', () => {
             const result = await main(params)
 
             expect(result.statusCode).toBe(200)
-            
+
             const body = JSON.parse(result.body)
             expect(body.jsonrpc).toBe('2.0')
             expect(body.id).toBe(2)
             expect(Array.isArray(body.result.tools)).toBe(true)
             expect(body.result.tools.length).toBeGreaterThan(0)
-            
+
             // Check that echo tool is present
             const echoTool = body.result.tools.find(tool => tool.name === 'echo')
             expect(echoTool).toBeDefined()
@@ -131,7 +131,7 @@ describe('MCP Server Template Tests', () => {
             const result = await main(params)
 
             expect(result.statusCode).toBe(200)
-            
+
             const body = JSON.parse(result.body)
             expect(body.jsonrpc).toBe('2.0')
             expect(body.id).toBe(3)
@@ -161,7 +161,7 @@ describe('MCP Server Template Tests', () => {
             const result = await main(params)
 
             expect(result.statusCode).toBe(200)
-            
+
             const body = JSON.parse(result.body)
             expect(body.jsonrpc).toBe('2.0')
             expect(body.id).toBe(4)
@@ -185,10 +185,10 @@ describe('MCP Server Template Tests', () => {
             const result = await main(params)
 
             expect(result.statusCode).toBe(200)
-            
+
             const body = JSON.parse(result.body)
             const toolNames = body.result.tools.map(tool => tool.name)
-            
+
             expect(toolNames).toEqual(expect.arrayContaining(['echo', 'calculator', 'weather']))
             expect(toolNames).toHaveLength(3)
             expect(toolNames).not.toContain('example_tool')
@@ -217,7 +217,7 @@ describe('MCP Server Template Tests', () => {
             const result = await main(params)
 
             expect(result.statusCode).toBe(200)
-            
+
             const body = JSON.parse(result.body)
             expect(body.jsonrpc).toBe('2.0')
             expect(body.id).toBe(11)
@@ -248,7 +248,7 @@ describe('MCP Server Template Tests', () => {
             const result = await main(params)
 
             expect(result.statusCode).toBe(200)
-            
+
             const body = JSON.parse(result.body)
             expect(body.jsonrpc).toBe('2.0')
             expect(body.id).toBe(5)
@@ -272,7 +272,7 @@ describe('MCP Server Template Tests', () => {
             const result = await main(params)
 
             expect(result.statusCode).toBe(200)
-            
+
             const body = JSON.parse(result.body)
             expect(body.jsonrpc).toBe('2.0')
             expect(body.id).toBe(6)
@@ -293,7 +293,7 @@ describe('MCP Server Template Tests', () => {
 
             // The server returns 500 for JSON parsing errors, which is correct behavior
             expect(result.statusCode).toBe(500)
-            
+
             const body = JSON.parse(result.body)
             expect(body.jsonrpc).toBe('2.0')
             expect(body.error).toBeDefined()
@@ -319,7 +319,7 @@ describe('MCP Server Template Tests', () => {
             const result = await main(params)
 
             expect(result.statusCode).toBe(404)
-            
+
             const body = JSON.parse(result.body)
             expect(body.jsonrpc).toBe('2.0')
             expect(body.error.code).toBe(-32601)
@@ -344,7 +344,7 @@ describe('Custom Tool Tests', () => {
     test('should test your custom tool', async () => {
         // Example test for a custom tool
         // Replace with actual tests for your tools
-        
+
         const toolCallRequest = {
             jsonrpc: '2.0',
             id: 100,
@@ -357,6 +357,7 @@ describe('Custom Tool Tests', () => {
             }
         }
 
+        // eslint-disable-next-line no-unused-vars
         const params = {
             __ow_method: 'post',
             __ow_body: JSON.stringify(toolCallRequest),
@@ -366,7 +367,7 @@ describe('Custom Tool Tests', () => {
         // Uncomment and modify when you add custom tools
         // const result = await main(params)
         // expect(result.statusCode).toBe(200)
-        
+
         expect(true).toBe(true) // Placeholder assertion
     })
 })
