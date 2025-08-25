@@ -10,13 +10,13 @@
  *
  * @returns {string}
  */
-function stringParameters(params) {
-  // hide authorization header
-  let headers = params.__ow_headers || {}
-  if (headers.authorization) {
-    headers = { ...headers, authorization: '<hidden>' }
-  }
-  return JSON.stringify({ ...params, __ow_headers: headers })
+function stringParameters (params) {
+    // hide authorization header
+    let headers = params.__ow_headers || {}
+    if (headers.authorization) {
+        headers = { ...headers, authorization: '<hidden>' }
+    }
+    return JSON.stringify({ ...params, __ow_headers: headers })
 }
 
 /**
@@ -30,9 +30,9 @@ function stringParameters(params) {
  * @returns {Array}
  *
  */
-function getMissingKeys(obj, required = [], requiredHeaders = []) {
-  return required.filter(r => (typeof obj[r] === 'undefined' || obj[r] === '' || obj[r] === null))
-    .concat(requiredHeaders.filter(h => typeof obj.__ow_headers[h] === 'undefined'))
+function getMissingKeys (obj, required = [], requiredHeaders = []) {
+    return required.filter(r => (typeof obj[r] === 'undefined' || obj[r] === '' || obj[r] === null))
+        .concat(requiredHeaders.filter(h => typeof obj.__ow_headers[h] === 'undefined'))
 }
 
 /**
@@ -46,12 +46,12 @@ function getMissingKeys(obj, required = [], requiredHeaders = []) {
  * @returns {string}
  *
  */
-function checkMissingRequestInputs(params, requiredParams = [], requiredHeaders = []) {
-  const missing = getMissingKeys(params, requiredParams, requiredHeaders)
-  if (missing.length > 0) {
-    return `missing parameter(s) '${missing}'`
-  }
-  return null
+function checkMissingRequestInputs (params, requiredParams = [], requiredHeaders = []) {
+    const missing = getMissingKeys(params, requiredParams, requiredHeaders)
+    if (missing.length > 0) {
+        return `missing parameter(s) '${missing}'`
+    }
+    return null
 }
 
 /**
@@ -61,13 +61,13 @@ function checkMissingRequestInputs(params, requiredParams = [], requiredHeaders 
  *
  * @returns {string|undefined} the token string or undefined if not set.
  */
-function getBearerToken(params) {
-  if (params.__ow_headers &&
+function getBearerToken (params) {
+    if (params.__ow_headers &&
       params.__ow_headers.authorization &&
       params.__ow_headers.authorization.startsWith('Bearer ')) {
-    return params.__ow_headers.authorization.substring('Bearer '.length)
-  }
-  return undefined
+        return params.__ow_headers.authorization.substring('Bearer '.length)
+    }
+    return undefined
 }
 
 /**
@@ -80,18 +80,18 @@ function getBearerToken(params) {
  *
  * @returns {object} the error object, ready to be returned from the action main's function.
  */
-function errorResponse(statusCode, message, logger) {
-  if (logger && typeof logger.info === 'function') {
-    logger.info(`${statusCode}: ${message}`)
-  }
-  return {
-    error: {
-      statusCode,
-      body: {
-        error: message
-      }
+function errorResponse (statusCode, message, logger) {
+    if (logger && typeof logger.info === 'function') {
+        logger.info(`${statusCode}: ${message}`)
     }
-  }
+    return {
+        error: {
+            statusCode,
+            body: {
+                error: message
+            }
+        }
+    }
 }
 
 /**
@@ -102,17 +102,17 @@ function errorResponse(statusCode, message, logger) {
  *
  * @returns {object} the response object, ready to be returned from the action main's function.
  */
-function successResponse(body, statusCode = 200) {
-  return {
-    statusCode,
-    body
-  }
+function successResponse (body, statusCode = 200) {
+    return {
+        statusCode,
+        body
+    }
 }
 
 module.exports = {
-  errorResponse,
-  successResponse,
-  stringParameters,
-  checkMissingRequestInputs,
-  getBearerToken
+    errorResponse,
+    successResponse,
+    stringParameters,
+    checkMissingRequestInputs,
+    getBearerToken
 }

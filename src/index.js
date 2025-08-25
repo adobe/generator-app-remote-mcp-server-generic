@@ -10,28 +10,32 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const Generator = require('yeoman-generator')
 const path = require('path')
+const { ActionGenerator, commonTemplates } = require('@adobe/generator-app-common-lib')
 
-/*
+/**
  * Adobe I/O Runtime MCP Server Template Generator
  *
- * Yeoman generator lifecycle:
- * - initializing
- * - prompting
- * - configuring
- * - default
- * - writing
- * - conflicts
- * - install
- * - end
+ * Creates a complete Model Context Protocol server for Adobe I/O Runtime.
+ * Extends ActionGenerator for professional utilities and MCP v2024-11-05 compliance.
+ *
+ * Lifecycle: initializing → prompting → configuring → writing → install → end
  */
 
-class McpIoRuntimeGenerator extends Generator {
+class McpIoRuntimeGenerator extends ActionGenerator {
+  /**
+   * @param {Array} args - Command line arguments
+   * @param {Object} opts - Generator options
+   */
   constructor (args, opts) {
+    // Set required ActionGenerator options
+    opts = opts || {}
+    opts['action-folder'] = opts['action-folder'] || 'actions'
+    opts['config-path'] = opts['config-path'] || 'app.config.yaml'
+    opts['full-key-to-manifest'] = opts['full-key-to-manifest'] || 'application.runtimeManifest'
     super(args, opts)
 
-    // options are inputs from CLI or yeoman parent generator
+    // CLI options for non-interactive usage
     this.option('skip-prompt', {
       type: Boolean,
       default: false,
@@ -53,19 +57,22 @@ class McpIoRuntimeGenerator extends Generator {
       description: 'Project author'
     })
 
-    // Initialize props with defaults
+    // Initialize default properties
     this.props = {
-      features: ['tools', 'resources', 'prompts'], // Default features
+      features: ['tools', 'resources', 'prompts'],
       includeExamples: true
     }
   }
 
+  /**
+   * Set up initial state and merge CLI options
+   */
   async initializing () {
     this.log('🚀 Initializing Adobe I/O Runtime MCP Server template...')
 
-    // Set default values
+    // Merge CLI options with defaults
     this.props = {
-      ...this.props, // Keep existing defaults
+      ...this.props,
       projectName: this.options['project-name'] || 'my-mcp-server',
       description: this.options.description || 'Model Context Protocol server with Adobe I/O Runtime',
       author: this.options.author || 'Your Name',
@@ -74,8 +81,11 @@ class McpIoRuntimeGenerator extends Generator {
     }
   }
 
+  /**
+   * Collect user input via interactive prompts
+   */
   async prompting () {
-    // Skip prompts if skip-prompt option is set
+    // Skip prompts if requested
     if (this.options['skip-prompt']) {
       this.log('⏭️  Skipping prompts, using default values...')
       return
@@ -83,6 +93,7 @@ class McpIoRuntimeGenerator extends Generator {
 
     this.log('📝 Please provide some information about your MCP server:')
 
+    // Define prompts with validation
     const prompts = [
       {
         type: 'input',
@@ -93,7 +104,7 @@ class McpIoRuntimeGenerator extends Generator {
           if (!input || input.trim().length === 0) {
             return 'Project name is required'
           }
-          // Validate project name format (lowercase, hyphens allowed)
+          // Validate npm package naming conventions
           if (!/^[a-z0-9-]+$/.test(input)) {
             return 'Project name should only contain lowercase letters, numbers, and hyphens'
           }
@@ -142,16 +153,18 @@ class McpIoRuntimeGenerator extends Generator {
       }
     ]
 
+    // Execute prompts and merge answers
     const answers = await this.prompt(prompts)
-
-    // Merge answers with existing props
     this.props = { ...this.props, ...answers }
   }
 
+  /**
+   * Process and normalize user inputs
+   */
   async configuring () {
     this.log('⚙️  Configuring MCP server template...')
 
-    // Normalize project name for use in file names and package.json
+    // Normalize project name for npm compatibility
     this.props.normalizedProjectName = this.props.projectName
       .toLowerCase()
       .replace(/[^a-z0-9-]/g, '-')
@@ -159,19 +172,25 @@ class McpIoRuntimeGenerator extends Generator {
       .replace(/^-|-$/g, '')
   }
 
+  /**
+   * Generate all template files
+   */
   async writing () {
     this.log('📁 Writing MCP server files...')
 
     const destFolder = '.'
     this.sourceRoot(path.join(__dirname, './templates/'))
 
-    // Copy template files with template processing
+    // Prepare template variables for EJS processing
     const templateProps = {
       ...this.props,
-      projectName: this.props.normalizedProjectName
+      projectName: this.props.normalizedProjectName || this.props.projectName,
+      description: this.props.description || 'Model Context Protocol server with Adobe I/O Runtime',
+      author: this.props.author || 'Your Name',
+      utilsRelPath: '../actions/utils'
     }
 
-    // Copy main template files
+    // Copy template files with EJS processing
     const filesToCopy = [
       'package.json',
       'app.config.yaml',
@@ -184,12 +203,12 @@ class McpIoRuntimeGenerator extends Generator {
       '.babelrc',
       'actions/mcp-server/index.js',
       'actions/mcp-server/webpack.config.js',
-      'actions/utils.js',
       'test/jest.setup.js',
       'test/mcp-server.test.js',
       'workspace-config.example.json'
     ]
 
+    // Process each template file
     filesToCopy.forEach(file => {
       this.fs.copyTpl(
         this.templatePath(file),
@@ -198,14 +217,28 @@ class McpIoRuntimeGenerator extends Generator {
       )
     })
 
-    // Copy .gitignore file (renamed from _dot.gitignore to avoid npm pack issues)
+    // Use Adobe's commonTemplates for utilities
+    this.fs.copyTpl(
+      commonTemplates.utils,
+      this.destinationPath(path.join(destFolder, 'actions/utils.js')),
+      templateProps
+    )
+
+    // Use Adobe's commonTemplates for utility tests
+    this.fs.copyTpl(
+      commonTemplates['utils.test'],
+      this.destinationPath(path.join(destFolder, 'test/utils.test.js')),
+      templateProps
+    )
+
+    // Copy .gitignore (renamed from _dot.gitignore to avoid npm pack issues)
     this.fs.copyTpl(
       this.templatePath('_dot.gitignore'),
       this.destinationPath(path.join(destFolder, '.gitignore')),
       templateProps
     )
 
-    // Copy other template files
+    // Copy main entry point
     this.fs.copyTpl(
       this.templatePath('index.js'),
       this.destinationPath(path.join(destFolder, 'index.js')),
@@ -213,6 +246,9 @@ class McpIoRuntimeGenerator extends Generator {
     )
   }
 
+  /**
+   * Install project dependencies
+   */
   async install () {
     this.log('📦 Installing dependencies...')
 
@@ -223,6 +259,9 @@ class McpIoRuntimeGenerator extends Generator {
     }
   }
 
+  /**
+   * Display completion message and perform final setup
+   */
   async end () {
     this.log('')
     this.log('🎉 Your MCP server template has been created successfully!')
@@ -236,12 +275,11 @@ class McpIoRuntimeGenerator extends Generator {
     this.log('📖 Adobe I/O Runtime docs: https://developer.adobe.com/runtime/docs/')
     this.log('')
 
-    // Ensure install.yml is available for AIO CLI validation
+    // Copy install.yml for AIO CLI compatibility
     const installYmlSource = this.templatePath('../../install.yml')
     const installYmlDest = this.destinationPath('node_modules/@adobe/generator-app-remote-mcp-server-generic/install.yml')
 
     try {
-      // Create the directory structure if it doesn't exist
       const fs = require('fs')
       const path = require('path')
       const destDir = path.dirname(installYmlDest)
@@ -250,14 +288,14 @@ class McpIoRuntimeGenerator extends Generator {
         fs.mkdirSync(destDir, { recursive: true })
       }
 
-      // Copy install.yml to the expected location
       if (fs.existsSync(installYmlSource)) {
         fs.copyFileSync(installYmlSource, installYmlDest)
       }
     } catch (error) {
-      // Silently ignore errors - this is just to prevent the AIO CLI warning
+      // Silently ignore errors
     }
   }
 }
 
+// Export generator for Yeoman and aio CLI
 module.exports = McpIoRuntimeGenerator

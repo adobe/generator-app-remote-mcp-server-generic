@@ -1,52 +1,52 @@
 /**
  * Jest Configuration for MCP Server Template
- * 
+ *
  * This configuration sets up Jest for testing your MCP server.
  * Customize these settings based on your testing needs.
  */
 
 module.exports = {
-  // Test environment
-  testEnvironment: 'node',
+    // Test environment
+    testEnvironment: 'node',
 
-  // Test file patterns
-  testMatch: [
-    '**/test/**/*.test.js',
-    '**/test/**/*.spec.js'
-  ],
+    // Test file patterns
+    testMatch: [
+        '**/test/**/*.test.js',
+        '**/test/**/*.spec.js'
+    ],
 
-  // Coverage collection
-  collectCoverage: true,
-  coverageDirectory: 'coverage',
-  coverageReporters: ['text', 'lcov', 'html'],
-  
-  // Coverage patterns
-  collectCoverageFrom: [
-    'actions/**/*.js',
-    '!actions/**/dist/**',
-    '!actions/**/node_modules/**'
-  ],
+    // Coverage collection
+    collectCoverage: true,
+    coverageDirectory: 'coverage',
+    coverageReporters: ['text', 'lcov', 'html'],
 
-  // Setup files
-  setupFilesAfterEnv: ['<rootDir>/test/jest.setup.js'],
+    // Coverage patterns
+    collectCoverageFrom: [
+        'actions/**/*.js',
+        '!actions/**/dist/**',
+        '!actions/**/node_modules/**'
+    ],
 
-  // Module paths
-  moduleDirectories: ['node_modules', '<rootDir>'],
+    // Setup files
+    setupFilesAfterEnv: ['<rootDir>/test/jest.setup.js'],
 
-  // Timeout for tests (in milliseconds)
-  testTimeout: 30000,
+    // Module paths
+    moduleDirectories: ['node_modules', '<rootDir>'],
 
-  // Verbose output
-  verbose: true,
+    // Timeout for tests (in milliseconds)
+    testTimeout: 30000,
 
-  // Clear mocks between tests
-  clearMocks: true,
+    // Verbose output
+    verbose: true,
 
-  // Error handling
-  errorOnDeprecated: true,
+    // Clear mocks between tests
+    clearMocks: true,
 
-  // Transform files
-  transform: {
-    '^.+\\.js$': 'babel-jest'
-  }
+    // Error handling
+    errorOnDeprecated: true,
+
+    // Transform files
+    transform: {
+        '^.+\\.js$': 'babel-jest'
+    }
 }

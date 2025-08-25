@@ -21,6 +21,7 @@
     "install.yml"
   ],
   "dependencies": {
+    "@adobe/generator-app-common-lib": "^3.0.0",
     "yeoman-generator": "^5",
     "yeoman-environment": "^3"
   },
