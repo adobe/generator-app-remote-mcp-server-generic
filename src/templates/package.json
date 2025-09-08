@@ -15,7 +15,9 @@
     "format": "prettier --write actions/"
   },
   "dependencies": {
-    "@adobe/aio-sdk": "^5.0.0"
+    "@adobe/aio-sdk": "^5.0.0",
+    "@modelcontextprotocol/sdk": "^1.17.4",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "jest": "^29.0.0",

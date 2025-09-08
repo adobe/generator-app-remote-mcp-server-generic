@@ -202,6 +202,7 @@ class McpIoRuntimeGenerator extends ActionGenerator {
       '.eslintrc.js',
       '.babelrc',
       'actions/mcp-server/index.js',
+      'actions/mcp-server/tools.js',
       'actions/mcp-server/webpack.config.js',
       'test/jest.setup.js',
       'test/mcp-server.test.js',
