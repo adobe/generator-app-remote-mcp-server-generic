@@ -1,5 +1,5 @@
 <!--
-Copyright 2024 Adobe. All rights reserved.
+Copyright 2025 Adobe. All rights reserved.
 This file is licensed to you under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License. You may obtain a copy
 of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -18,189 +18,102 @@ governing permissions and limitations under the License.
 [![License](https://img.shields.io/npm/l/@adobe/generator-app-remote-mcp-server-generic.svg)](https://github.com/adobe/generator-app-remote-mcp-server-generic/blob/main/package.json)
 [![Codecov Coverage](https://img.shields.io/codecov/c/github/adobe/generator-app-remote-mcp-server-generic/master.svg?style=flat-square)](https://codecov.io/gh/adobe/generator-app-remote-mcp-server-generic/)
 
-An Adobe Developer App Builder template for creating Model Context Protocol (MCP) servers using Adobe I/O Runtime.
+Adobe App Builder template for creating **Model Context Protocol (MCP) servers** using the official **MCP TypeScript SDK** and Adobe I/O Runtime.
 
 ## What is this template?
 
-This template helps you quickly bootstrap a **Model Context Protocol (MCP) server** that runs on Adobe I/O Runtime. MCP is an open protocol that enables secure connections between host applications (like Claude Desktop, IDEs, or other AI tools) and local services.
+Generate **MCP servers** that run on Adobe I/O Runtime. Connect AI assistants like Cursor, Claude Desktop, and other AI tools to your custom functions, data, and prompts through the standardized MCP protocol.
 
 ### Key Features
 
-- 🚀 **Serverless MCP Server**: Deploy MCP servers to Adobe I/O Runtime with automatic scaling
-- 🛠️ **Full MCP Implementation**: Supports Tools, Resources, and Prompts
-- 📝 **Interactive Setup**: Guided prompts to configure your MCP server
-- 🔧 **Production Ready**: Includes error handling, logging, and best practices
-- 📚 **Documentation**: Comprehensive README and examples included
+- 🔧 **Official MCP TypeScript SDK**: Built with `@modelcontextprotocol/sdk` v1.17.4
+- 📝 **Type Safety**: Zod schema validation for all parameters
+- 🚀 **Serverless Ready**: Deploy to Adobe I/O Runtime with auto-scaling
+- 🛠️ **Complete MCP Implementation**: Tools, Resources, and Prompts support
+- 📚 **Production Ready**: Error handling, logging, and CORS included
 
 ## Quick Start
 
 ### Prerequisites
-
-- Node.js 14 or higher
+- Node.js 18+ 
 - Adobe I/O CLI: `npm install -g @adobe/aio-cli`
 - Adobe Developer Console project with I/O Runtime enabled
 
-### Install the Template
-
-Using Adobe I/O CLI:
+### Generate Project
 
 ```bash
+# Using Adobe I/O CLI
 aio app init my-mcp-server --template @adobe/generator-app-remote-mcp-server-generic
-```
 
-Or using npm:
-
-```bash
+# Or using npm
 npm create @adobe/aio-app my-mcp-server --template @adobe/generator-app-remote-mcp-server-generic
 ```
 
-### What gets created
-
-The template generates a complete MCP server with:
-
-```
-my-mcp-server/
-├── actions/
-│   ├── mcp-server/
-│   │   └── index.js          # Main MCP server action
-│   └── utils.js              # Utility functions
-├── app.config.yaml           # Adobe I/O Runtime configuration
-├── package.json              # Dependencies and scripts
-├── .gitignore               # Git ignore rules
-└── README.md                # Project documentation
-```
-
-## Model Context Protocol (MCP) Features
-
-### Tools
-Allow AI assistants to call your custom functions:
-- Execute code
-- Perform calculations
-- Access external APIs
-- Process data
-
-### Resources
-Provide access to data sources and content:
-- Read files
-- Query databases
-- Fetch web content
-- Access APIs
-
-### Prompts
-Define reusable prompt templates:
-- System prompts
-- User prompt templates
-- Dynamic prompt generation
-
-## Development Workflow
-
-### 1. Local Development
+### Deploy & Use
 
 ```bash
 cd my-mcp-server
 npm install
-npm run dev
-```
-
-### 2. Deploy to Adobe I/O Runtime
-
-```bash
 npm run deploy
 ```
 
-### 3. Test your MCP Server
+Connect to your deployed MCP server in Cursor or Claude Desktop using the provided URL.
 
-Your MCP server will be available at the Adobe I/O Runtime action URL provided after deployment.
+## Generated Project Structure
 
-## Template Configuration
+```
+my-mcp-server/
+├── actions/mcp-server/
+│   ├── index.js          # Main MCP server (SDK-powered)
+│   └── tools.js          # Tools, resources & prompts
+├── app.config.yaml       # Adobe I/O Runtime config
+├── package.json          # Dependencies (includes MCP SDK)
+└── README.md             # Complete usage guide
+```
 
-### install.yml
+## MCP Features
 
-This template follows the [Adobe App Builder template specification](https://developer.adobe.com/app-builder-template-registry/guides/creating_template/):
+**Tools**: Interactive functions AI assistants can call (echo, calculator, weather)
+**Resources**: Static content access (documentation, data, files)  
+**Prompts**: Reusable prompt templates with parameters
 
-- **Categories**: `action`, `helper-template`
-- **Runtime**: Enabled for Adobe I/O Runtime
-- **Workspaces**: Creates a default workspace
-- **APIs**: No specific APIs required (configurable)
+All implemented using the official MCP TypeScript SDK with type-safe Zod schemas.
 
-### Interactive Prompts
+## Development
 
-The template includes interactive prompts for:
-- Project name validation
-- Project description
-- Author information
-- MCP feature selection (Tools, Resources, Prompts)
-- Example implementations
-
-## Testing the Template
-
-### Unit Tests
-
-Run the template's unit tests:
+### Testing the Generator
 
 ```bash
+# Run unit tests
 npm test
-```
 
-### End-to-End Testing
-
-Test the template generator:
-
-```bash
+# Test end-to-end generation
 npm run e2e
-```
-
-This creates a `temp-template-test` folder and runs the generator to verify everything works correctly.
-
-## Template Development
-
-### Project Structure
-
-```
-template/
-├── src/
-│   ├── index.js              # Yeoman generator
-│   └── templates/            # Template files
-│       ├── actions/          # MCP server implementation
-│       ├── package.json      # Generated project package.json
-│       ├── app.config.yaml   # Adobe I/O Runtime config
-│       ├── README.md         # Generated project README
-│       └── _dot.gitignore    # Generated .gitignore
-├── test/                     # Template tests
-├── install.yml               # Template configuration
-└── package.json              # Template package.json
 ```
 
 ### Customizing the Template
 
-1. **Modify Templates**: Edit files in `src/templates/` to change what gets generated
-2. **Update Generator**: Modify `src/index.js` to change prompts and generation logic
-3. **Add Features**: Extend the MCP server implementation in `src/templates/actions/mcp-server/index.js`
+1. **Modify Templates**: Edit files in `src/templates/`
+2. **Update Generator**: Modify `src/index.js` for prompts/logic
+3. **Extend Features**: Add capabilities in `src/templates/actions/mcp-server/tools.js`
 
-## Publishing to Adobe Template Registry
+### Publishing
 
-1. **Publish to npm**:
-   ```bash
-   npm publish
-   ```
+```bash
+# Publish to npm
+npm publish
 
-2. **Submit to Registry**:
-   - Go to [Adobe Template Submission](https://github.com/adobe/aio-template-submission/issues)
-   - Create a new "Template Update Request" issue
-   - Provide your npm module name: `@adobe/generator-app-remote-mcp-server-generic`
+# Submit to Adobe Template Registry
+# Create issue at: https://github.com/adobe/aio-template-submission/issues
+```
 
 ## Resources
 
-- 📚 [Model Context Protocol Specification](https://modelcontextprotocol.io)
-- 🏗️ [Adobe I/O Runtime Documentation](https://developer.adobe.com/runtime/docs/)
-- 🛠️ [Adobe App Builder](https://developer.adobe.com/app-builder/)
-- 📖 [Creating App Builder Templates](https://developer.adobe.com/app-builder-template-registry/guides/creating_template/)
-- 🎯 [Yeoman Generator Authoring](https://yeoman.io/authoring/)
+- 📚 [MCP Documentation](https://modelcontextprotocol.io/docs)
+- 🔧 [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)
+- 🏗️ [Adobe I/O Runtime](https://developer.adobe.com/runtime/docs/)
+- 📖 [App Builder Templates](https://developer.adobe.com/app-builder-template-registry/guides/creating_template/)
 
-# Contributing
+## License
 
-Contributions are welcomed! Read the [Contributing Guide](CONTRIBUTING.md) for more information.
-
-# Licensing
-
-This project is licensed under the Apache V2 License. See [LICENSE](LICENSE) for more information.
+Apache V2 License - see [LICENSE](LICENSE) for details.
