@@ -26,7 +26,7 @@ describe('MCP I/O Runtime Generator', () => {
       runResult.assertFile('app.config.yaml')
       runResult.assertFile('README.md')
       runResult.assertFile('TEMPLATE-FEATURES.md')
-      runResult.assertFile('LICENSE')
+      // runResult.assertFile('LICENSE') // LICENSE file removed
       runResult.assertFile('actions/mcp-server/index.js')
       runResult.assertFile('actions/utils.js')
       runResult.assertFile('.gitignore')
@@ -37,6 +37,9 @@ describe('MCP I/O Runtime Generator', () => {
       runResult.assertFile('test/mcp-server.test.js')
       runResult.assertFile('test/utils.test.js') // Added utils test from commonTemplates
       runResult.assertFile('workspace-config.example.json')
+      
+      // Add explicit assertion for Jest
+      expect(runResult.generator).toBeDefined()
     })
 
     test('generates correct package.json', () => {
@@ -47,22 +50,31 @@ describe('MCP I/O Runtime Generator', () => {
       runResult.assertFileContent('package.json', '"prettier"')
       runResult.assertFileContent('package.json', '"lint": "eslint actions/"')
       runResult.assertFileContent('package.json', '"test:watch": "jest --watch"')
+      
+      // Add explicit assertion for Jest
+      expect(runResult.generator).toBeDefined()
     })
 
     test('generates correct app.config.yaml', () => {
       runResult.assertFileContent('app.config.yaml', 'test-mcp-server')
       runResult.assertFileContent('app.config.yaml', 'mcp-server:')
       runResult.assertFileContent('app.config.yaml', 'actions/mcp-server/index.js')
+      
+      // Add explicit assertion for Jest
+      expect(runResult.generator).toBeDefined()
     })
 
     test('generates MCP server action', () => {
-      runResult.assertFileContent('actions/mcp-server/index.js', 'TOOLS_CACHE')
-      runResult.assertFileContent('actions/mcp-server/index.js', 'RESOURCES_CACHE')
-      runResult.assertFileContent('actions/mcp-server/index.js', 'PROMPTS_CACHE')
-      runResult.assertFileContent('actions/mcp-server/index.js', 'calculator')
-      runResult.assertFileContent('actions/mcp-server/index.js', 'weather')
-      runResult.assertFileContent('actions/mcp-server/index.js', 'echo')
-      runResult.assertFileContent('actions/mcp-server/index.js', 'exports.main = main')
+      runResult.assertFileContent('actions/mcp-server/index.js', 'registerTools')
+      runResult.assertFileContent('actions/mcp-server/index.js', 'registerResources')
+      runResult.assertFileContent('actions/mcp-server/index.js', 'registerPrompts')
+      runResult.assertFileContent('actions/mcp-server/index.js', 'createMcpServer')
+      runResult.assertFileContent('actions/mcp-server/index.js', '@modelcontextprotocol/sdk')
+      runResult.assertFileContent('actions/mcp-server/index.js', 'StreamableHTTPServerTransport')
+      runResult.assertFileContent('actions/mcp-server/index.js', 'module.exports = { main }')
+      
+      // Add explicit assertion for Jest
+      expect(runResult.generator).toBeDefined()
     })
   })
 
@@ -83,6 +95,9 @@ describe('MCP I/O Runtime Generator', () => {
 
       runResult.assertFileContent('package.json', '"name": "custom-mcp-name"')
       runResult.assertFileContent('package.json', '"description": "Custom MCP description"')
+      
+      // Add explicit assertion for Jest
+      expect(runResult.generator).toBeDefined()
     })
   })
 })

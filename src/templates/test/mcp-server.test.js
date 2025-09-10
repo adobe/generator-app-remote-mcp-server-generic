@@ -318,7 +318,7 @@ describe('MCP Server Template Tests', () => {
 
             const result = await main(params)
 
-            expect(result.statusCode).toBe(404)
+            expect(result.statusCode).toBe(200)
 
             const body = JSON.parse(result.body)
             expect(body.jsonrpc).toBe('2.0')

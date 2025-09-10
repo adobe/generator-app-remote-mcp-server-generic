@@ -95,7 +95,7 @@ function registerTools (server) {
 
     // Example weather API tool - demonstrates external API calls
     server.tool(
-        'MyWeather',
+        'weather',
         'Get current weather information for any city. This tool demonstrates how to integrate with external APIs and handle real-time data.',
         {
             city: z.string().describe('Name of the city to get weather for (e.g., "San Francisco", "New York", "London")')

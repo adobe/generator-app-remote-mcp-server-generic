@@ -18,7 +18,7 @@ Test connectivity and debugging with message echo functionality.
 Mathematical expression evaluation with configurable output formats (decimal, scientific, fraction).
 **Note**: Uses `eval()` - replace with proper math parser for production.
 
-### Weather Tool (MyWeather)
+### Weather Tool 
 Mock weather API demonstrating external service integration patterns. Ready for real API replacement.
 
 ## 📚 Resources & Prompts
