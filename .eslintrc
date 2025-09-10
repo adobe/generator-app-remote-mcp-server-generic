@@ -1,10 +1,20 @@
 {
   "plugins": ["jest"],
-  "extends": ["standard", "plugin:jest/recommended"],
+  "extends": ["eslint:recommended", "plugin:jest/recommended"],
+  "env": {
+    "node": true,
+    "es2021": true
+  },
   "globals": {
     "n": "readonly",
-    "r": "readonly",
+    "r": "readonly", 
     "assertDependencies": "readonly",
     "assertNodeEngines": "readonly"
+  },
+  "rules": {
+    "no-console": "off",
+    "indent": "off",
+    "no-unused-vars": "warn",
+    "no-undef": "error"
   }
 }
