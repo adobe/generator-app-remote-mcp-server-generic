@@ -9,7 +9,7 @@ application:
   runtimeManifest:
     packages:
       # Package name - change this to match your project name
-      <%= projectName %>-mcp-sdk:
+      <%= projectName %>:
         license: MIT
         actions:
           # Main MCP server action
