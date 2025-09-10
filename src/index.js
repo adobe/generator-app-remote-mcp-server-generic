@@ -196,12 +196,12 @@ class McpIoRuntimeGenerator extends ActionGenerator {
       'app.config.yaml',
       'README.md',
       'TEMPLATE-FEATURES.md',
-      'LICENSE',
       'webpack.config.js',
       'jest.config.js',
       '.eslintrc.js',
       '.babelrc',
       'actions/mcp-server/index.js',
+      'actions/mcp-server/tools.js',
       'actions/mcp-server/webpack.config.js',
       'test/jest.setup.js',
       'test/mcp-server.test.js',
@@ -267,7 +267,7 @@ class McpIoRuntimeGenerator extends ActionGenerator {
     this.log('🎉 Your MCP server template has been created successfully!')
     this.log('')
     this.log('Next steps:')
-    this.log('1. Install Adobe I/O CLI: npm install -g @adobe/aio-cli')
+    this.log('1. Install Adobe I/O CLI: npm install -g @adobe/aio-cli')  
     this.log('2. Configure your Adobe Developer Console project')
     this.log('3. Run "aio app deploy" to deploy your MCP server')
     this.log('')
