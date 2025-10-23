@@ -10,5 +10,5 @@ jobs:
     if: startsWith(github.event.head_commit.message, 'Release ')
     uses: adobe/aio-reusable-workflows/.github/workflows/on-push-publish-to-npm.yml@main
     secrets:
-      ADOBE_BOT_NPM_TOKEN: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
+      token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
 
