@@ -15,7 +15,7 @@ governing permissions and limitations under the License.
 [![Version](https://img.shields.io/npm/v/@adobe/generator-app-remote-mcp-server-generic.svg)](https://npmjs.org/package/@adobe/generator-app-remote-mcp-server-generic)
 [![Downloads/week](https://img.shields.io/npm/dw/@adobe/generator-app-remote-mcp-server-generic.svg)](https://npmjs.org/package/@adobe/generator-app-remote-mcp-server-generic)
 [![Node.js CI](https://github.com/adobe/generator-app-remote-mcp-server-generic/actions/workflows/node.js.yml/badge.svg)](https://github.com/adobe/generator-app-remote-mcp-server-generic/actions/workflows/node.js.yml)
-[![License](https://img.shields.io/npm/l/@adobe/generator-app-remote-mcp-server-generic.svg)](https://github.com/adobe/generator-app-remote-mcp-server-generic/blob/main/package.json)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/adobe/generator-app-remote-mcp-server-generic/blob/main/LICENSE)
 [![Codecov Coverage](https://img.shields.io/codecov/c/github/adobe/generator-app-remote-mcp-server-generic/master.svg?style=flat-square)](https://codecov.io/gh/adobe/generator-app-remote-mcp-server-generic/)
 
 Adobe App Builder template for creating **Model Context Protocol (MCP) servers** using the official **MCP TypeScript SDK** and Adobe I/O Runtime.
