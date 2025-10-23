@@ -1,6 +1,6 @@
 {
   "name": "@adobe/generator-app-remote-mcp-server-generic",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Adobe I/O Runtime template for Model Context Protocol (MCP) server implementation with serverless actions",
   "main": "src/index.js",
   "engines": {
