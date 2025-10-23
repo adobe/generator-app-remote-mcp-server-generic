@@ -59,17 +59,6 @@ npm run deploy
 
 Connect to your deployed MCP server in Cursor or Claude Desktop using the provided URL.
 
-## Generated Project Structure
-
-```
-my-mcp-server/
-├── actions/mcp-server/
-│   ├── index.js          # Main MCP server (SDK-powered)
-│   └── tools.js          # Tools, resources & prompts
-├── app.config.yaml       # Adobe I/O Runtime config
-├── package.json          # Dependencies (includes MCP SDK)
-└── README.md             # Complete usage guide
-```
 
 ## MCP Features
 
@@ -77,7 +66,7 @@ my-mcp-server/
 **Resources**: Static content access (documentation, data, files)  
 **Prompts**: Reusable prompt templates with parameters
 
-All implemented using the official MCP TypeScript SDK with type-safe Zod schemas.
+All implemented using the official MCP TypeScript SDK  
 
 ## Development
 
@@ -97,15 +86,6 @@ npm run e2e
 2. **Update Generator**: Modify `src/index.js` for prompts/logic
 3. **Extend Features**: Add capabilities in `src/templates/actions/mcp-server/tools.js`
 
-### Publishing
-
-```bash
-# Publish to npm
-npm publish
-
-# Submit to Adobe Template Registry
-# Create issue at: https://github.com/adobe/aio-template-submission/issues
-```
 
 ## Resources
 
