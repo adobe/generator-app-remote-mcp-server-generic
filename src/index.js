@@ -274,26 +274,6 @@ class McpIoRuntimeGenerator extends ActionGenerator {
     this.log('📚 Learn more about MCP: https://modelcontextprotocol.io')
     this.log('📖 Adobe I/O Runtime docs: https://developer.adobe.com/runtime/docs/')
     this.log('')
-
-    // Copy install.yml for AIO CLI compatibility
-    const installYmlSource = this.templatePath('../../install.yml')
-    const installYmlDest = this.destinationPath('node_modules/@adobe/generator-app-remote-mcp-server-generic/install.yml')
-
-    try {
-      const fs = require('fs')
-      const path = require('path')
-      const destDir = path.dirname(installYmlDest)
-
-      if (!fs.existsSync(destDir)) {
-        fs.mkdirSync(destDir, { recursive: true })
-      }
-
-      if (fs.existsSync(installYmlSource)) {
-        fs.copyFileSync(installYmlSource, installYmlDest)
-      }
-    } catch (error) {
-      // Silently ignore errors
-    }
   }
 }
 
