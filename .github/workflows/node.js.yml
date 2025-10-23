@@ -1,0 +1,14 @@
+name: Node.js CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    uses: adobe/aio-reusable-workflows/.github/workflows/node.js.yml@main
+
