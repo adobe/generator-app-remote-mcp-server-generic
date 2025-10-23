@@ -13,7 +13,6 @@
     "model-context-protocol",
     "adobe-io",
     "runtime",
-    "serverless",
     "yeoman-generator"
   ],
   "files": [
