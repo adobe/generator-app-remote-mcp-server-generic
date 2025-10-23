@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'package.json'
 
 jobs:
   publish:
     if: startsWith(github.event.head_commit.message, 'Release ')
     uses: adobe/aio-reusable-workflows/.github/workflows/on-push-publish-to-npm.yml@main
-    secrets:
-      token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
-
+    secrets: inherit
