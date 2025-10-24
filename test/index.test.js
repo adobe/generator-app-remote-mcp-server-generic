@@ -49,6 +49,7 @@ describe('MCP I/O Runtime Generator', () => {
       runResult.assertFile('test/mcp-server.test.js')
       runResult.assertFile('test/utils.test.js') // Added utils test from commonTemplates
       runResult.assertFile('workspace-config.example.json')
+      runResult.assertFile('install.yml') // Verify install.yml is copied
       
       // Add explicit assertion for Jest
       expect(runResult.generator).toBeDefined()
@@ -84,6 +85,17 @@ describe('MCP I/O Runtime Generator', () => {
       runResult.assertFileContent('actions/mcp-server/index.js', '@modelcontextprotocol/sdk')
       runResult.assertFileContent('actions/mcp-server/index.js', 'StreamableHTTPServerTransport')
       runResult.assertFileContent('actions/mcp-server/index.js', 'module.exports = { main }')
+      
+      // Add explicit assertion for Jest
+      expect(runResult.generator).toBeDefined()
+    })
+
+    test('generates correct install.yml', () => {
+      runResult.assertFileContent('install.yml', '$schema: http://json-schema.org/draft-07/schema')
+      runResult.assertFileContent('install.yml', 'categories:')
+      runResult.assertFileContent('install.yml', '- action')
+      runResult.assertFileContent('install.yml', '- helper-template')
+      runResult.assertFileContent('install.yml', 'runtime: true')
       
       // Add explicit assertion for Jest
       expect(runResult.generator).toBeDefined()
