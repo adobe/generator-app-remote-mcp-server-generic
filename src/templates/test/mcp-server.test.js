@@ -334,7 +334,7 @@ describe('MCP Server Template Tests', () => {
 
             const body = JSON.parse(result.body)
             expect(body.jsonrpc).toBe('2.0')
-            expect(body.error.code).toBe(-32601)
+            expect(body.error.code).toBe(-32602) // Invalid params - this is what the MCP SDK returns for unknown tools
         })
 
         test('should handle unsupported HTTP method', async () => {
@@ -347,39 +347,5 @@ describe('MCP Server Template Tests', () => {
 
             expect(result.statusCode).toBe(405)
         })
-    })
-})
-
-// Additional test helpers and utilities
-describe('Custom Tool Tests', () => {
-    // Add tests for your custom tools here
-    test('should test your custom tool', async () => {
-        // Example test for a custom tool
-        // Replace with actual tests for your tools
-
-        const toolCallRequest = {
-            jsonrpc: '2.0',
-            id: 100,
-            method: 'tools/call',
-            params: {
-                name: 'your_custom_tool', // Replace with your tool name
-                arguments: {
-                    // Add your tool parameters here
-                }
-            }
-        }
-
-        // eslint-disable-next-line no-unused-vars
-        const params = {
-            __ow_method: 'post',
-            __ow_body: JSON.stringify(toolCallRequest),
-            LOG_LEVEL: 'info'
-        }
-
-        // Uncomment and modify when you add custom tools
-        // const result = await main(params)
-        // expect(result.statusCode).toBe(200)
-
-        expect(true).toBe(true) // Placeholder assertion
     })
 })
