@@ -59,6 +59,25 @@ npm run deploy
 
 Connect to your deployed MCP server in Cursor or Claude Desktop using the provided URL.
 
+### Claude Desktop Configuration
+
+Add this to your Claude Desktop configuration file:
+
+```json
+{
+  "mcpServers": {
+    "any-name-you-want-to-provide-for-claude": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://xxxx.adobeioruntime.net/api/v1/web/your-project/mcp-server"
+      ]
+    }
+  }
+}
+```
+
+
 
 ## MCP Features
 
