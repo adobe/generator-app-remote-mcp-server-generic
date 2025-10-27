@@ -20,6 +20,7 @@ governing permissions and limitations under the License.
 
 Adobe App Builder template for creating **Model Context Protocol (MCP) servers** using the official **MCP TypeScript SDK** and Adobe I/O Runtime.
 
+
 ## What is this template?
 
 Generate **MCP servers** that run on Adobe I/O Runtime. Connect AI assistants like Cursor, Claude Desktop, and other AI tools to your custom functions, data, and prompts through the standardized MCP protocol.
@@ -104,6 +105,12 @@ npm run e2e
 1. **Modify Templates**: Edit files in `src/templates/`
 2. **Update Generator**: Modify `src/index.js` for prompts/logic
 3. **Extend Features**: Add capabilities in `src/templates/actions/mcp-server/tools.js`
+
+## 👥 Contributors
+
+<a href="https://github.com/adobe/generator-app-remote-mcp-server-generic/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=adobe/generator-app-remote-mcp-server-generic" />
+</a>
 
 
 ## Resources
