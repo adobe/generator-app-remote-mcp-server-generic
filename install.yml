@@ -3,7 +3,6 @@ $id: https://adobe.io/schemas/app-builder-templates/1
 
 categories:
   - action
-  - helper-template
 
 workspaces:
   - default
