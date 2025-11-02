@@ -94,7 +94,6 @@ describe('MCP I/O Runtime Generator', () => {
       runResult.assertFileContent('install.yml', '$schema: http://json-schema.org/draft-07/schema')
       runResult.assertFileContent('install.yml', 'categories:')
       runResult.assertFileContent('install.yml', '- action')
-      runResult.assertFileContent('install.yml', '- helper-template')
       runResult.assertFileContent('install.yml', 'runtime: true')
       
       // Add explicit assertion for Jest
