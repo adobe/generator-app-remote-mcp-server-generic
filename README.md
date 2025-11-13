@@ -52,7 +52,7 @@ aio app init
 
 ```bash
 cd my-mcp-server
-aio app use <your-worspace-config.json>
+aio app use <your-workspace-config.json>
 aio app deploy
 
 ```
@@ -77,7 +77,17 @@ Add this to your Claude Desktop configuration file:
 }
 ```
 
-
+### Cursor configs 
+```json
+{
+  "mcpServers": {
+    "mcp-server-name": {
+      "url": "https://<namespace>.adobeioruntime.net/api/v1/web/<xyz>/mcp-server",
+      "type": "streamable-http"  
+   }
+  }
+}
+```
 
 ## MCP Features
 
