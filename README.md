@@ -43,19 +43,18 @@ Generate **MCP servers** that run on Adobe I/O Runtime. Connect AI assistants li
 ### Generate Project
 
 ```bash
-# Using Adobe I/O CLI
-aio app init my-mcp-server --template @adobe/generator-app-remote-mcp-server-generic
+# Using Adobe I/O CLI , You will see tempalte generator-app-remote-mcp-server-generic listed in the all tempaltes list
+aio app init
 
-# Or using npm
-npm create @adobe/aio-app my-mcp-server --template @adobe/generator-app-remote-mcp-server-generic
 ```
 
 ### Deploy & Use
 
 ```bash
 cd my-mcp-server
-npm install
-npm run deploy
+aio app use <your-worspace-config.json>
+aio app deploy
+
 ```
 
 Connect to your deployed MCP server in Cursor or Claude Desktop using the provided URL.
