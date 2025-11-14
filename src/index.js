@@ -205,8 +205,7 @@ class McpIoRuntimeGenerator extends ActionGenerator {
       'actions/mcp-server/webpack.config.js',
       'test/jest.setup.js',
       'test/mcp-server.test.js',
-      'workspace-config.example.json',
-      'install.yml'
+      'workspace-config.example.json'
     ]
 
     // Process each template file
