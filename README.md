@@ -66,7 +66,7 @@ Add this to your Claude Desktop configuration file:
 ```json
 {
   "mcpServers": {
-    "any-name-you-want-to-provide-for-claude": {
+    "mcp-server-name": {
       "command": "npx",
       "args": [
         "mcp-remote",
@@ -88,6 +88,9 @@ Add this to your Claude Desktop configuration file:
   }
 }
 ```
+
+### Example Test prompt 
+" Hey, Can you please ask #mcp-server-name# about weather in Noida? "
 
 ## MCP Features
 
