@@ -47,7 +47,7 @@ function createMcpServer () {
     registerResources(server)
     registerPrompts(server)
 
-            if (logger) {
+    if (logger) {
         logger.info('MCP Server created with tools, resources, prompts, and logging capabilities')
     }
 
@@ -81,20 +81,53 @@ function parseRequestBody (params) {
 }
 
 /**
+ * Normalize headers to lowercase keys for consistent lookup
+ */
+function normalizeHeaders (headers) {
+    const normalized = {}
+    if (headers) {
+        for (const key in headers) {
+            normalized[key.toLowerCase()] = headers[key]
+        }
+    }
+    return normalized
+}
+
+/**
  * Create minimal req object compatible with StreamableHTTPServerTransport
  */
 function createCompatibleRequest (params) {
     const body = parseRequestBody(params)
 
-        return {
+    // Normalize incoming headers to lowercase keys
+    const incomingHeaders = normalizeHeaders(params.__ow_headers)
+
+    // Log if client requested SSE (for debugging)
+    if (incomingHeaders.accept && incomingHeaders.accept.includes('text/event-stream')) {
+        logger?.info('Client requested SSE streaming, forcing JSON mode (serverless limitation)')
+    }
+
+    // Build headers with lowercase keys
+    // SDK requires Accept header to include both application/json AND text/event-stream
+    const headers = {
+        'content-type': 'application/json',
+        'mcp-session-id': params['mcp-session-id'] || incomingHeaders['mcp-session-id'],
+        ...incomingHeaders,
+        // SDK requires both content types - it will use enableJsonResponse to pick JSON mode
+        'accept': 'application/json, text/event-stream'
+    }
+
+    return {
         method: (params.__ow_method || 'GET').toUpperCase(),
-        headers: {
-            'content-type': 'application/json',
-            'accept': 'application/json, text/event-stream',
-            'mcp-session-id': params['mcp-session-id'] || params.__ow_headers?.['mcp-session-id'],
-            ...(params.__ow_headers || {})
-        },
+        url: params.__ow_path || '/mcp-server',
+        path: params.__ow_path || '/mcp-server',
+        headers,
         body,
+        // Socket mock for streaming checks
+        socket: {
+            remoteAddress: '127.0.0.1',
+            encrypted: true
+        },
         get (name) {
             return this.headers[name.toLowerCase()]
         }
@@ -117,13 +150,20 @@ function createCompatibleResponse () {
     let headersSent = false
 
     const res = {
-    // Status and headers
-        status: code => { statusCode = code; return res },
+        // Status and headers
+        status: code => { 
+            statusCode = code
+            res.statusCode = code
+            return res 
+        },
         setHeader: (name, value) => { headers[name] = value; return res },
         getHeader: name => headers[name],
-        writeHead: (code, headerObj = {}) => {
+        writeHead: (code, reasonOrHeaders, headerObj) => {
             statusCode = code
-            headers = { ...headers, ...headerObj }
+            res.statusCode = code
+            // Handle both writeHead(code, headers) and writeHead(code, reason, headers)
+            const hdrs = typeof reasonOrHeaders === 'object' ? reasonOrHeaders : (headerObj || {})
+            headers = { ...headers, ...hdrs }
             headersSent = true
             return res
         },
@@ -132,14 +172,12 @@ function createCompatibleResponse () {
         write: chunk => {
             if (chunk) {
                 body += typeof chunk === 'string' ? chunk : JSON.stringify(chunk)
-                logger?.info('Response write called with chunk length:', String(chunk).length)
             }
             return true
         },
         end: chunk => {
             if (chunk) {
                 body += typeof chunk === 'string' ? chunk : JSON.stringify(chunk)
-                logger?.info('Response end called with chunk length:', String(chunk).length)
             }
             headersSent = true
             return res
@@ -148,13 +186,11 @@ function createCompatibleResponse () {
             headers['Content-Type'] = 'application/json'
             body = JSON.stringify(obj)
             headersSent = true
-            logger?.info('Response json called with object:', JSON.stringify(obj).substring(0, 200))
             return res
         },
         send: data => {
             if (data) {
                 body = typeof data === 'string' ? data : JSON.stringify(data)
-                logger?.info('Response send called with data length:', String(data).length)
             }
             headersSent = true
             return res
@@ -162,11 +198,34 @@ function createCompatibleResponse () {
 
         // Properties
         get headersSent () { return headersSent },
+        get writableEnded () { return false },
+        get writableFinished () { return false },
+        get finished () { return false },
+        get writable () { return true },
+        statusCode: 200,
+        
+        // Socket mock (needed for streaming checks)
+        socket: {
+            writable: true,
+            destroyed: false,
+            on: () => {},
+            once: () => {},
+            removeListener: () => {},
+            write: () => true,
+            end: () => {}
+        },
+        connection: null,
+        
+        // Flush method
+        flushHeaders: () => { headersSent = true },
 
         // Event emitter (minimal implementation)
-        on: () => {},
-        emit: () => {},
-        removeListener: () => {},
+        on: (event, handler) => { return res },
+        once: (event, handler) => { return res },
+        emit: (event, ...args) => { return true },
+        removeListener: () => { return res },
+        addListener: (event, handler) => { return res },
+        off: (event, handler) => { return res },
 
         // Get result for Adobe I/O Runtime
         getResult: () => {
@@ -222,23 +281,25 @@ function handleOptionsRequest () {
 }
 
 /**
- * Handle MCP requests using the SDK - following the exact stateless pattern
+ * Handle MCP requests using the SDK
+ * Creates fresh server and transport instances per request (stateless pattern)
  */
 async function handleMcpRequest (params) {
-    // Following the exact pattern from simpleStatelessStreamableHttp.ts
     const server = createMcpServer()
 
     try {
-        logger?.info('Creating fresh MCP server and transport (stateless pattern)')
+        logger?.info('Creating fresh MCP server and transport')
 
         // Create minimal compatible req/res objects
         const req = createCompatibleRequest(params)
         const res = createCompatibleResponse()
 
-        // Create fresh transport for this request (stateless)
+        logger?.info('Request method:', req.body?.method)
+
+        // Create fresh transport for this request
         const transport = new StreamableHTTPServerTransport({
-            sessionIdGenerator: undefined, // Let SDK manage sessions
-            enableJsonResponse: true, // Enable JSON response mode for MCP Inspector compatibility
+            sessionIdGenerator: undefined, // Stateless - no session tracking
+            enableJsonResponse: true
         })
 
         // Connect server to transport
@@ -246,38 +307,24 @@ async function handleMcpRequest (params) {
 
         // Create a promise that resolves when the response is complete
         const responseComplete = new Promise(resolve => {
-            // Override the end method to know when response is done
             const originalEnd = res.end.bind(res)
             res.end = function (chunk) {
                 const result = originalEnd(chunk)
-                // Give a small delay to ensure all writes are captured
                 setTimeout(() => resolve(), 10)
                 return result
             }
         })
 
-        // Let the SDK handle everything - this is the key line!
+        // Let the SDK handle the request
         await transport.handleRequest(req, res, req.body)
-
-        // Wait for the response to be complete
         await responseComplete
 
-        // Cleanup (following the pattern from examples)
-        res.on('close', () => {
-            logger?.info('Request closed, cleaning up')
-            transport.close()
-            server.close()
-        })
-
         logger?.info('MCP request processed by SDK')
-
-        // Return Adobe I/O Runtime response
         return res.getResult()
 
-            } catch (error) {
+    } catch (error) {
         logger?.error('Error in handleMcpRequest:', error)
 
-        // Cleanup on error
         try {
             server.close()
         } catch (cleanupError) {
@@ -326,8 +373,26 @@ async function main (params) {
         logger.info(`Request method: ${params.__ow_method}`)
 
         // Route requests
+        const incomingHeaders = normalizeHeaders(params.__ow_headers)
+        
         switch (params.__ow_method?.toLowerCase()) {
         case 'get':
+            // Check if client is requesting SSE stream
+            // Return empty 200 response to gracefully indicate SSE is not available
+            // This prevents error messages in MCP clients while allowing fallback to HTTP
+            if (incomingHeaders.accept && incomingHeaders.accept.includes('text/event-stream')) {
+                logger.info('SSE stream requested - not supported in serverless, returning graceful response')
+                return {
+                    statusCode: 200,
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                        'Content-Type': 'text/event-stream',
+                        'Cache-Control': 'no-cache',
+                        'Connection': 'close'
+                    },
+                    body: 'event: error\ndata: {"error": "SSE not supported in serverless. Use HTTP transport."}\n\n'
+                }
+            }
             logger.info('Health check request')
             return handleHealthCheck()
 
