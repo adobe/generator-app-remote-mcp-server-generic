@@ -22,6 +22,19 @@ const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js')
 const { StreamableHTTPServerTransport } = require('@modelcontextprotocol/sdk/server/streamableHttp.js')
 const { registerTools, registerResources, registerPrompts } = require('./tools.js')
 
+// SDK 1.24+ uses Web Standard transport. Optional module (see webpack externals) so build succeeds on 1.17.4.
+let _webStandardTransport = null
+function getWebStandardTransport () {
+ if (_webStandardTransport !== undefined) return _webStandardTransport
+ try {
+  const web = require('@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js')
+  _webStandardTransport = web.WebStandardStreamableHTTPServerTransport
+ } catch (_) {
+  _webStandardTransport = null
+ }
+ return _webStandardTransport
+}
+
 // Global logger variable
 let logger = null
 
@@ -94,7 +107,45 @@ function normalizeHeaders (headers) {
 }
 
 /**
- * Create minimal req object compatible with StreamableHTTPServerTransport
+ * Create a Web Standard Request from Adobe I/O params (for SDK 1.24+ WebStandardStreamableHTTPServerTransport)
+*/
+function createWebRequest (params) {
+    const body = parseRequestBody(params)
+    const incomingHeaders = normalizeHeaders(params.__ow_headers)
+    const method = (params.__ow_method || 'POST').toUpperCase()
+    const path = params.__ow_path || '/mcp-server'
+    const url = `https://runtime.adobe.io${path}`
+    const headers = new Headers(incomingHeaders)
+    // SDK 1.24+ requires both; set after incoming so client cannot override
+    headers.set('content-type', 'application/json')
+    headers.set('accept', 'application/json, text/event-stream')
+    const mcpSessionId = params['mcp-session-id'] || incomingHeaders['mcp-session-id']
+    if (mcpSessionId) headers.set('mcp-session-id', mcpSessionId)
+    const init = { method, headers }
+    if (body != null && method === 'POST') {
+      init.body = typeof body === 'string' ? body : JSON.stringify(body)
+    }
+    return new Request(url, init)
+}
+/**
+ * Convert Web Standard Response to Adobe I/O Runtime return shape { statusCode, headers, body }
+ */
+async function responseToRuntime (response) {
+const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, DELETE',
+    'Access-Control-Allow-Headers': 'Content-Type, Accept, Authorization, x-api-key, mcp-session-id, Last-Event-ID',
+    'Access-Control-Expose-Headers': 'Content-Type, mcp-session-id, Last-Event-ID',
+    'Access-Control-Max-Age': '86400'
+}
+response.headers.forEach((value, key) => {
+    headers[key] = value
+})
+const body = await response.text()
+return { statusCode: response.status, headers, body }
+}
+/**
+ * Create minimal req object compatible with StreamableHTTPServerTransport (SDK 1.17.x)
  */
 function createCompatibleRequest (params) {
     const body = parseRequestBody(params)
@@ -282,15 +333,33 @@ function handleOptionsRequest () {
 
 /**
  * Handle MCP requests using the SDK
- * Creates fresh server and transport instances per request (stateless pattern)
- */
+ * Creates fresh server and transport instances per request (stateless pattern).
+* Uses WebStandardStreamableHTTPServerTransport on SDK 1.24+ (Request/Response);
+* falls back to StreamableHTTPServerTransport + mock req/res on SDK 1.17.x.
+*/
 async function handleMcpRequest (params) {
     const server = createMcpServer()
+    const body = parseRequestBody(params)
 
     try {
         logger?.info('Creating fresh MCP server and transport')
 
-        // Create minimal compatible req/res objects
+        const WebStandardTransport = getWebStandardTransport()
+        if (WebStandardTransport) {
+        // SDK 1.24+: use Web Standard transport (no real Node req/res needed)
+        const transport = new WebStandardTransport({
+            sessionIdGenerator: undefined,
+            enableJsonResponse: true
+        })
+        await server.connect(transport)
+        const webRequest = createWebRequest(params)
+        logger?.info('Request method:', body?.method)
+        const requestOptions = body != null ? { parsedBody: body } : {}
+        const response = await transport.handleRequest(webRequest, requestOptions)
+        logger?.info('MCP request processed by SDK (Web Standard transport)')
+        return await responseToRuntime(response)
+        }
+        // SDK 1.17.x: use Node-style transport with mock req/res
         const req = createCompatibleRequest(params)
         const res = createCompatibleResponse()
 
@@ -369,7 +438,7 @@ async function main (params) {
             }
         }
 
-        logger.info('MCP Server using official TypeScript SDK v1.17.4')
+        logger.info('MCP Server using @modelcontextprotocol/sdk (Web Standard transport on 1.24+, Node transport on 1.17.x)')
         logger.info(`Request method: ${params.__ow_method}`)
 
         // Route requests
