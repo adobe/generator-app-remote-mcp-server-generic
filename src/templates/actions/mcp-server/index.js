@@ -23,7 +23,8 @@ const { StreamableHTTPServerTransport } = require('@modelcontextprotocol/sdk/ser
 const { registerTools, registerResources, registerPrompts } = require('./tools.js')
 
 // SDK 1.24+ uses Web Standard transport. Optional module (see webpack externals) so build succeeds on 1.17.4.
-let _webStandardTransport = null
+// undefined = not yet loaded; null = load failed or unavailable; otherwise the transport class.
+let _webStandardTransport
 function getWebStandardTransport () {
  if (_webStandardTransport !== undefined) return _webStandardTransport
  try {
