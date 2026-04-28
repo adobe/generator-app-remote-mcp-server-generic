@@ -19,7 +19,128 @@ governing permissions and limitations under the License.
 
 const { main } = require('../actions/mcp-server/index.js')
 
+// Test authentication token
+const TEST_AUTH_TOKEN = 'test-token-12345'
+
 describe('MCP Server Template Tests', () => {
+    // Test authentication
+    describe('Authentication', () => {
+        test('should reject request without auth token when configured', async () => {
+            const params = {
+                __ow_method: 'get',
+                __ow_path: '/',
+                LOG_LEVEL: 'info',
+                MCP_AUTH_TOKEN: TEST_AUTH_TOKEN,
+                __ow_headers: {}
+            }
+
+            const result = await main(params)
+
+            expect(result.statusCode).toBe(401)
+            const body = JSON.parse(result.body)
+            expect(body.error.message).toContain('Authentication failed')
+        })
+
+        test('should accept request with valid Bearer token', async () => {
+            const params = {
+                __ow_method: 'get',
+                __ow_path: '/',
+                LOG_LEVEL: 'info',
+                MCP_AUTH_TOKEN: TEST_AUTH_TOKEN,
+                __ow_headers: {
+                    Authorization: `Bearer ${TEST_AUTH_TOKEN}`
+                }
+            }
+
+            const result = await main(params)
+
+            expect(result.statusCode).toBe(200)
+            const body = JSON.parse(result.body)
+            expect(body.status).toBe('healthy')
+        })
+
+        test('should accept request with direct token', async () => {
+            const params = {
+                __ow_method: 'get',
+                __ow_path: '/',
+                LOG_LEVEL: 'info',
+                MCP_AUTH_TOKEN: TEST_AUTH_TOKEN,
+                __ow_headers: {
+                    authorization: TEST_AUTH_TOKEN
+                }
+            }
+
+            const result = await main(params)
+
+            expect(result.statusCode).toBe(200)
+            const body = JSON.parse(result.body)
+            expect(body.status).toBe('healthy')
+        })
+
+        test('should reject request with invalid token', async () => {
+            const params = {
+                __ow_method: 'get',
+                __ow_path: '/',
+                LOG_LEVEL: 'info',
+                MCP_AUTH_TOKEN: TEST_AUTH_TOKEN,
+                __ow_headers: {
+                    Authorization: 'Bearer wrong-token'
+                }
+            }
+
+            const result = await main(params)
+
+            expect(result.statusCode).toBe(401)
+            const body = JSON.parse(result.body)
+            expect(body.error.message).toContain('Invalid authentication token')
+        })
+
+        test('should allow OPTIONS request without auth (CORS preflight)', async () => {
+            const params = {
+                __ow_method: 'options',
+                LOG_LEVEL: 'info',
+                MCP_AUTH_TOKEN: TEST_AUTH_TOKEN,
+                __ow_headers: {}
+            }
+
+            const result = await main(params)
+
+            expect(result.statusCode).toBe(200)
+        })
+
+        test('should allow requests when auth token is not configured', async () => {
+            const params = {
+                __ow_method: 'get',
+                __ow_path: '/',
+                LOG_LEVEL: 'info',
+                __ow_headers: {}
+                // No MCP_AUTH_TOKEN set
+            }
+
+            const result = await main(params)
+
+            expect(result.statusCode).toBe(200)
+            const body = JSON.parse(result.body)
+            expect(body.status).toBe('healthy')
+        })
+
+        test('should allow requests when auth token is default placeholder', async () => {
+            const params = {
+                __ow_method: 'get',
+                __ow_path: '/',
+                LOG_LEVEL: 'info',
+                MCP_AUTH_TOKEN: 'your-secret-token-here',
+                __ow_headers: {}
+            }
+
+            const result = await main(params)
+
+            expect(result.statusCode).toBe(200)
+            const body = JSON.parse(result.body)
+            expect(body.status).toBe('healthy')
+        })
+    })
+
     // Test server health check
     describe('Health Check', () => {
         test('should respond to GET request with health status', async () => {

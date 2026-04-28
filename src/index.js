@@ -266,10 +266,21 @@ class McpIoRuntimeGenerator extends ActionGenerator {
     this.log('')
     this.log('🎉 Your MCP server template has been created successfully!')
     this.log('')
+    
+    // Add authentication token hint to .env if it exists
+    const envPath = this.destinationPath('.env')
+    if (this.fs.exists(envPath)) {
+      const envContent = this.fs.read(envPath)
+      if (!envContent.includes('MCP_AUTH_TOKEN')) {
+        this.fs.append(envPath, '\n# MCP Authentication Token (optional)\n# Generate: node -e "console.log(require(\'crypto\').randomUUID())"\n# Leave as default to disable authentication\nMCP_AUTH_TOKEN=your-secret-token-here\n')
+      }
+    }
+    
     this.log('Next steps:')
     this.log('1. Install Adobe I/O CLI: npm install -g @adobe/aio-cli')  
     this.log('2. Configure your Adobe Developer Console project')
-    this.log('3. Run "aio app deploy" to deploy your MCP server')
+    this.log('3. (Optional) Set MCP_AUTH_TOKEN in .env for authentication')
+    this.log('4. Run "aio app deploy" to deploy your MCP server')
     this.log('')
     this.log('📚 Learn more about MCP: https://modelcontextprotocol.io')
     this.log('📖 Adobe I/O Runtime docs: https://developer.adobe.com/runtime/docs/')

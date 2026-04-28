@@ -26,6 +26,44 @@ const { registerTools, registerResources, registerPrompts } = require('./tools.j
 let logger = null
 
 /**
+ * Validate authentication token from request headers
+ * Checks for Bearer token in Authorization header 
+ */
+function validateAuthToken (params) {
+    const requiredToken = params.MCP_AUTH_TOKEN
+    
+    // If no token is configured, it is intentional ,skip authentication
+    if (!requiredToken || requiredToken === 'your-secret-token-here') {
+        logger?.warn('No authentication token configured - authentication disabled')
+        return { isValid: true }
+    }
+    
+    const headers = normalizeHeaders(params.__ow_headers)
+    const authHeader = headers.authorization || headers.Authorization
+    
+    if (!authHeader) {
+        return {
+            isValid: false,
+            error: 'Missing Authorization header'
+        }
+    }
+    
+    // Support both "Bearer <token>" and direct token
+    const token = authHeader.startsWith('Bearer ') 
+        ? authHeader.substring(7) 
+        : authHeader
+    
+    if (token !== requiredToken) {
+        return {
+            isValid: false,
+            error: 'Invalid authentication token'
+        }
+    }
+    
+    return { isValid: true }
+}
+
+/**
  * Create MCP server instance with all capabilities
  * Following the exact pattern from SDK examples
  */
@@ -371,6 +409,31 @@ async function main (params) {
 
         logger.info('MCP Server using official TypeScript SDK v1.17.4')
         logger.info(`Request method: ${params.__ow_method}`)
+
+        // Validate authentication token for all requests except OPTIONS (CORS preflight)
+        if (params.__ow_method?.toLowerCase() !== 'options') {
+            const authResult = validateAuthToken(params)
+            if (!authResult.isValid) {
+                logger.warn(`Authentication failed: ${authResult.error}`)
+                return {
+                    statusCode: 401,
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                        'Content-Type': 'application/json',
+                        'WWW-Authenticate': 'Bearer realm="MCP Server"'
+                    },
+                    body: JSON.stringify({
+                        jsonrpc: '2.0',
+                        error: {
+                            code: -32000,
+                            message: `Authentication failed: ${authResult.error}`
+                        },
+                        id: null
+                    })
+                }
+            }
+            logger.info('Authentication successful')
+        }
 
         // Route requests
         const incomingHeaders = normalizeHeaders(params.__ow_headers)

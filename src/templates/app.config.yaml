@@ -25,6 +25,9 @@ application:
             inputs:
               # Set log level (debug, info, warn, error)
               LOG_LEVEL: debug
+              # Authentication token for MCP server (set in .env)
+              # Leave as default to disable authentication
+              MCP_AUTH_TOKEN: $MCP_AUTH_TOKEN
             annotations:
               # No Adobe authentication required for MCP servers
               require-adobe-auth: false

@@ -98,7 +98,60 @@ Add this to your Claude Desktop configuration file:
 **Resources**: Static content access (documentation, data, files)  
 **Prompts**: Reusable prompt templates with parameters
 
-All implemented using the official MCP TypeScript SDK  
+## Authentication
+
+This MCP server includes optional token-based authentication to secure your endpoints. **It is just a reference implementation to use when required and it is the responsibility of implementor to add the desired authentication as per their use case to their generated mcp server.**
+
+### Enabling Sample Authentication
+
+1. **Add token to `.env` file:**
+  ```bash
+   # Generate a secure token
+   node -e "console.log(require('crypto').randomUUID())"
+
+   # Add to .env
+   MCP_AUTH_TOKEN=your-generated-token-here
+  ```
+2. **Deploy your application:**
+  ```bash
+   aio app deploy
+  ```
+3. **Configure your MCP client** with the token in headers:
+  ```json
+   {
+     "mcpServers": {
+       "<%= projectName %>": {
+         "url": "https://your-runtime-url.adobeioruntime.net/api/v1/web/<%= projectName %>/mcp-server",
+         "type": "streamable-http",
+         "headers": {
+           "Authorization": "Bearer your-generated-token-here"
+         }
+       }
+     }
+   }
+  ```
+
+### How It Works
+
+- If `MCP_AUTH_TOKEN` is set in `.env`, all requests (except CORS OPTIONS) require authentication
+- If `MCP_AUTH_TOKEN` is not set or left as default, authentication is disabled
+- Tokens can be sent as `Bearer <token>` or directly in the Authorization header
+- Failed authentication returns 401 Unauthorized
+
+### Disabling Authentication
+
+For disabling Authentication, leave `MCP_AUTH_TOKEN` unset 
+
+### Token generation example
+
+**Node** 
+```bash
+   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+**OpenSSl**
+```bash
+   openssl rand -hex 32
+```
 
 ## Development
 
