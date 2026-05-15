@@ -17,6 +17,9 @@ governing permissions and limitations under the License.
  * Uses the stateless pattern where fresh server and transport instances are created per request.
  */
 
+// Must run before @modelcontextprotocol/sdk imports (SDK 1.24+ uses global File at load time).
+require('./node18-web-globals.js')
+
 const { Core } = require('@adobe/aio-sdk')
 const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js')
 const { StreamableHTTPServerTransport } = require('@modelcontextprotocol/sdk/server/streamableHttp.js')
