@@ -310,7 +310,7 @@ function handleHealthCheck () {
             status: 'healthy',
             server: '<%= projectName %>',
             version: '1.0.0',
-            description: 'Adobe I/O Runtime MCP Server using official TypeScript SDK v1.17.4',
+            description: 'Adobe I/O Runtime MCP Server using official TypeScript SDK MCP v1.24.x',
             timestamp: new Date().toISOString(),
             transport: 'StreamableHTTP',
             sdk: '@modelcontextprotocol/sdk'
