@@ -12,6 +12,16 @@ governing permissions and limitations under the License.
 
 const path = require('path')
 
+// With SDK 1.24+, bundle the Web Standard transport so it works at runtime (serverless often deploys bundle only).
+// With SDK 1.17.4, the module does not exist so mark external so build does not fail.
+const webStandardModule = '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js'
+let externals = []
+try {
+  require.resolve(webStandardModule)
+} catch (_) {
+  externals = [webStandardModule]
+}
+
 module.exports = {
     entry: './index.js',
     mode: 'production',
@@ -20,5 +30,9 @@ module.exports = {
         path: path.resolve(__dirname, 'dist'),
         filename: 'index.js',
         libraryTarget: 'commonjs2'
-    }
+    },
+    externals,
+    ignoreWarnings: [
+        { module: /\/node_modules\/express\/lib\/view\.js$/, message: /Critical dependency: the request of a dependency is an expression/ }
+    ]
 }

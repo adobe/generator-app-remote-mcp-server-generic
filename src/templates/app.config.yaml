@@ -16,7 +16,7 @@ application:
           mcp-server:
             function: actions/mcp-server/index.js
             web: 'yes'
-            runtime: 'nodejs:18'
+            runtime: 'nodejs:20'
             limits:
               # Timeout in milliseconds (5 minutes for complex operations)
               timeout: 300000

@@ -40,6 +40,7 @@ describe('MCP I/O Runtime Generator', () => {
       runResult.assertFile('TEMPLATE-FEATURES.md')
       // runResult.assertFile('LICENSE') // LICENSE file removed
       runResult.assertFile('actions/mcp-server/index.js')
+      runResult.assertFile('actions/mcp-server/node18-web-globals.js')
       runResult.assertFile('actions/utils.js')
       runResult.assertFile('.gitignore')
       runResult.assertFile('jest.config.js')
@@ -71,6 +72,7 @@ describe('MCP I/O Runtime Generator', () => {
       runResult.assertFileContent('app.config.yaml', 'test-mcp-server')
       runResult.assertFileContent('app.config.yaml', 'mcp-server:')
       runResult.assertFileContent('app.config.yaml', 'actions/mcp-server/index.js')
+      runResult.assertFileContent('app.config.yaml', "runtime: 'nodejs:20'")
       
       // Add explicit assertion for Jest
       expect(runResult.generator).toBeDefined()
@@ -81,6 +83,7 @@ describe('MCP I/O Runtime Generator', () => {
       runResult.assertFileContent('actions/mcp-server/index.js', 'registerResources')
       runResult.assertFileContent('actions/mcp-server/index.js', 'registerPrompts')
       runResult.assertFileContent('actions/mcp-server/index.js', 'createMcpServer')
+      runResult.assertFileContent('actions/mcp-server/index.js', 'node18-web-globals.js')
       runResult.assertFileContent('actions/mcp-server/index.js', '@modelcontextprotocol/sdk')
       runResult.assertFileContent('actions/mcp-server/index.js', 'StreamableHTTPServerTransport')
       runResult.assertFileContent('actions/mcp-server/index.js', 'module.exports = { main }')
