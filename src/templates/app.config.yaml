@@ -25,6 +25,12 @@ application:
             inputs:
               # Set log level (debug, info, warn, error)
               LOG_LEVEL: debug
+              # Authentication: IMS token validation or API key
+              # Set AUTH_VALIDATE_IMS=true to validate Bearer tokens via Adobe IMS
+              # Set SERVICE_API_KEY for simple API key authentication
+              # Leave both unset for no authentication (development only)
+              SERVICE_API_KEY: $SERVICE_API_KEY
+              AUTH_VALIDATE_IMS: $AUTH_VALIDATE_IMS
             annotations:
               # No Adobe authentication required for MCP servers
               require-adobe-auth: false

@@ -24,6 +24,7 @@ const { Core } = require('@adobe/aio-sdk')
 const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js')
 const { StreamableHTTPServerTransport } = require('@modelcontextprotocol/sdk/server/streamableHttp.js')
 const { registerTools, registerResources, registerPrompts } = require('./tools.js')
+const { validateRequestAuth } = require('./validator.js')
 
 // SDK 1.24+ uses Web Standard transport. Optional module (see webpack externals) so build succeeds on 1.17.4.
 // undefined = not yet loaded; null = load failed or unavailable; otherwise the transport class.
@@ -447,9 +448,39 @@ async function main (params) {
 
         // Route requests
         const incomingHeaders = normalizeHeaders(params.__ow_headers)
+        const requestPath = params.__ow_path || ''
         
         switch (params.__ow_method?.toLowerCase()) {
         case 'get':
+            // Handle OAuth metadata requests - return proper JSON indicating OAuth is not supported
+            if (requestPath.includes('.well-known/oauth') || requestPath.includes('/oauth/') || requestPath.includes('/authorize') || requestPath.includes('/token')) {
+                logger.info('OAuth endpoint requested - returning not supported response')
+                const useIms = String(params.AUTH_VALIDATE_IMS || "").toLowerCase() === "true"
+                const serviceKey = params.SERVICE_API_KEY && String(params.SERVICE_API_KEY).trim()
+                
+                let authMessage = "This MCP server does not support OAuth. "
+                if (useIms) {
+                    authMessage += "IMS token authentication is required. Please configure your MCP client with 'Authorization: Bearer YOUR_IMS_TOKEN' header. See server documentation for configuration examples."
+                } else if (serviceKey) {
+                    authMessage += "API key authentication is required. Please configure your MCP client with 'Authorization: Bearer YOUR_API_KEY' or 'x-api-key: YOUR_API_KEY' header."
+                } else {
+                    authMessage += "No authentication is configured on this server."
+                }
+                
+                return {
+                    statusCode: 200,
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        error: "oauth_not_supported",
+                        error_description: authMessage,
+                        oauth_enabled: false
+                    })
+                }
+            }
+            
             // Check if client is requesting SSE stream
             // Return empty 200 response to gracefully indicate SSE is not available
             // This prevents error messages in MCP clients while allowing fallback to HTTP
@@ -474,7 +505,35 @@ async function main (params) {
             return handleOptionsRequest()
 
         case 'post':
-            logger.info('MCP protocol request - delegating to SDK')
+            logger.info('MCP protocol request - validating authentication')
+            
+            // Validate authentication if configured (only for POST requests)
+            const authResult = await validateRequestAuth(params, logger)
+            if (authResult.error) {
+                logger.warn('Authentication failed:', authResult.error)
+                return {
+                    statusCode: 401,
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        jsonrpc: '2.0',
+                        error: {
+                            code: -32001,
+                            message: authResult.error
+                        },
+                        id: null
+                    })
+                }
+            }
+            // Optionally attach userInfo to params for downstream use
+            if (authResult.userInfo) {
+                params.AUTH_USER_INFO = authResult.userInfo
+                logger.info('IMS authentication successful')
+            }
+            
+            logger.info('Authentication passed - delegating to SDK')
             return await handleMcpRequest(params)
 
         default:
