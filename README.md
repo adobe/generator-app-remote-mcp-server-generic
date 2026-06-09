@@ -44,7 +44,7 @@ Generate **MCP servers** that run on Adobe I/O Runtime. Connect AI assistants li
 ### Generate Project
 
 ```bash
-# Using Adobe I/O CLI , You will see tempalte generator-app-remote-mcp-server-generic listed in the all tempaltes list
+# Using Adobe I/O CLI , You will see template generator-app-remote-mcp-server-generic listed in the all templates list
 aio app init
 
 ```
