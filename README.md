@@ -31,6 +31,7 @@ Generate **MCP servers** that run on Adobe I/O Runtime. Connect AI assistants li
 - 📝 **Type Safety**: Zod schema validation for all parameters
 - 🚀 **Serverless Ready**: Deploy to Adobe I/O Runtime with auto-scaling
 - 🛠️ **Complete MCP Implementation**: Tools, Resources, and Prompts support
+- 🔐 **Built-in Authentication**: IMS token validation and API key support
 - 📚 **Production Ready**: Error handling, logging, and CORS included
 
 ## Quick Start
@@ -99,6 +100,110 @@ Add this to your Claude Desktop configuration file:
 **Prompts**: Reusable prompt templates with parameters
 
 All implemented using the official MCP TypeScript SDK  
+
+## Authentication
+
+The generated MCP servers include built-in authentication support to secure your endpoints:
+
+### IMS Token Validation (Adobe Users)
+
+Validate Bearer tokens via Adobe IMS userinfo endpoint. Ideal for Adobe employee or partner authentication.
+
+**Setup:**
+```bash
+# Set in .env or app.config.yaml
+AUTH_VALIDATE_IMS=true
+```
+
+**Client Configuration (Cursor):**
+```json
+{
+  "mcpServers": {
+    "my-mcp": {
+      "url": "https://namespace.adobeioruntime.net/api/v1/web/pkg/mcp-server",
+      "type": "streamable-http",
+      "headers": {
+        "Authorization": "Bearer YOUR_IMS_TOKEN"
+      }
+    }
+  }
+}
+```
+
+**Client Configuration (Claude Desktop):**
+```json
+{
+  "mcpServers": {
+    "my-mcp": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://namespace.adobeioruntime.net/api/v1/web/pkg/mcp-server",
+        "--header",
+        "Authorization:${IMS_TOKEN}"
+      ],
+      "env": {
+        "IMS_TOKEN": "Bearer YOUR_IMS_TOKEN"
+      }
+    }
+  }
+}
+```
+
+### API Key Authentication (Service-to-Service)
+
+Simple key-based authentication for service-to-service communication.
+
+**Setup:**
+```bash
+# Set in .env or app.config.yaml
+SERVICE_API_KEY=your-secret-key-here
+```
+
+**Client Configuration (Cursor):**
+```json
+{
+  "mcpServers": {
+    "my-mcp": {
+      "url": "https://namespace.adobeioruntime.net/api/v1/web/pkg/mcp-server",
+      "type": "streamable-http",
+      "headers": {
+        "x-api-key": "your-secret-key-here"
+      }
+    }
+  }
+}
+```
+
+**Client Configuration (Claude Desktop):**
+```json
+{
+  "mcpServers": {
+    "my-mcp": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://namespace.adobeioruntime.net/api/v1/web/pkg/mcp-server",
+        "--header",
+        "x-api-key:${API_KEY}"
+      ],
+      "env": {
+        "API_KEY": "your-secret-key-here"
+      }
+    }
+  }
+}
+```
+
+### No Authentication (Development Only)
+
+Leave both variables unset for open access during development. **Not recommended for production.**
+
+**Security Best Practices:**
+- Always enable authentication in production deployments
+- Use strong random values for `SERVICE_API_KEY`
+- Never commit secrets to version control
+- Rotate API keys regularly
 
 ## Development
 

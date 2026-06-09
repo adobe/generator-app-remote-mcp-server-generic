@@ -203,6 +203,7 @@ class McpIoRuntimeGenerator extends ActionGenerator {
       'actions/mcp-server/index.js',
       'actions/mcp-server/node18-web-globals.js',
       'actions/mcp-server/tools.js',
+      'actions/mcp-server/validator.js',
       'actions/mcp-server/webpack.config.js',
       'test/jest.setup.js',
       'test/mcp-server.test.js',
@@ -236,6 +237,13 @@ class McpIoRuntimeGenerator extends ActionGenerator {
     this.fs.copyTpl(
       this.templatePath('_dot.gitignore'),
       this.destinationPath(path.join(destFolder, '.gitignore')),
+      templateProps
+    )
+
+    // Copy .env.example for environment variable configuration
+    this.fs.copyTpl(
+      this.templatePath('.env.example'),
+      this.destinationPath(path.join(destFolder, '.env.example')),
       templateProps
     )
 
