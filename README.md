@@ -31,6 +31,7 @@ Generate **MCP servers** that run on Adobe I/O Runtime. Connect AI assistants li
 - 📝 **Type Safety**: Zod schema validation for all parameters
 - 🚀 **Serverless Ready**: Deploy to Adobe I/O Runtime with auto-scaling
 - 🛠️ **Complete MCP Implementation**: Tools, Resources, and Prompts support
+- 🎨 **MCP App UI**: The weather tool renders an interactive, themed card (via `@modelcontextprotocol/ext-apps`) instead of plain text, as a starting example for building your own tool UIs
 - 🔐 **Built-in Authentication**: IMS token validation and API key support
 - 📚 **Production Ready**: Error handling, logging, and CORS included
 
@@ -44,7 +45,7 @@ Generate **MCP servers** that run on Adobe I/O Runtime. Connect AI assistants li
 ### Generate Project
 
 ```bash
-# Using Adobe I/O CLI , You will see tempalte generator-app-remote-mcp-server-generic listed in the all tempaltes list
+# Using Adobe I/O CLI , You will see template generator-app-remote-mcp-server-generic listed in the all templates list
 aio app init
 
 ```
@@ -100,6 +101,17 @@ Add this to your Claude Desktop configuration file:
 **Prompts**: Reusable prompt templates with parameters
 
 All implemented using the official MCP TypeScript SDK  
+
+### Weather Tool UI
+
+The `weather` tool doesn't just return text - it links its result to an `ui://weather/mcp-app.html`
+resource via `_meta.ui.resourceUri`, so MCP Apps-capable hosts render a themed, animated weather
+card (sun/clouds/rain/snow) instead of a plain response. The UI source lives in
+`actions/mcp-server/app-ui/src/weather/` (HTML/CSS/TypeScript, built with Vite) and is inlined into
+the deployed bundle at build time (`npm run build:ui && npm run embed:ui`, run automatically as
+part of `npm run build`), since Adobe I/O Runtime only deploys the single webpack bundle. Add more
+MCP App UIs by dropping a new `app-ui/src/<name>/<name>.{html,ts,css}` - the build scripts pick it
+up automatically.
 
 ## Authentication
 

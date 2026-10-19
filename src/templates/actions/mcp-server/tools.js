@@ -23,7 +23,32 @@ governing permissions and limitations under the License.
  * - MyWeather: Mock weather API tool (demonstrates external API patterns)
  */
 
+const fs = require('fs/promises')
+const path = require('path')
 const { z } = require('zod')
+
+// Adobe I/O Runtime only deploys the bundled index.js - no sibling static/ files - so the
+// weather-app UI must ride inside the bundle as a required JS string (see scripts/embed-ui.js,
+// run via `npm run embed:ui` as part of `npm run build`). Falls back to reading actions/mcp-server/static/
+// on disk for local dev when the embed step hasn't been run yet.
+let embeddedUi = null
+try {
+    embeddedUi = require('./embedded-ui.js')
+} catch {
+    // Local dev without embed step - falls back to reading actions/mcp-server/static/
+}
+
+async function loadUiHtml (filePath, embeddedKey) {
+    const embedded = embeddedUi?.[embeddedKey]
+    if (typeof embedded === 'string' && embedded.length > 0) {
+        return embedded
+    }
+    return fs.readFile(filePath, 'utf-8')
+}
+
+// UI resource for the weather tool - links the tool result to its rendered card (see registerResources)
+const WEATHER_RESOURCE_URI = 'ui://weather/mcp-app.html'
+const WEATHER_RESOURCE_MIME_TYPE = 'text/html;profile=mcp-app'
 
 /**
  * Register all tools with the MCP server
@@ -105,12 +130,26 @@ function registerTools (server) {
         }
     )
 
-    // Example weather API tool - demonstrates external API calls
-    server.tool(
+    // Example weather API tool - demonstrates external API calls and an MCP App UI
+    // (weather-app/) that renders the result as a themed, animated card.
+    server.registerTool(
         'weather',
-        'Get current weather information for any city. This tool demonstrates how to integrate with external APIs and handle real-time data.',
         {
-            city: z.string().describe('Name of the city to get weather for (e.g., "San Francisco", "New York", "London")')
+            title: 'Weather',
+            description: 'Get current weather information for any city. This tool demonstrates how to integrate with external APIs, handle real-time data, and render a themed MCP App UI.',
+            inputSchema: {
+                city: z.string().describe('Name of the city to get weather for (e.g., "San Francisco", "New York", "London")')
+            },
+            // Note: no outputSchema here. The MCP SDK's zod-to-json-schema conversion stamps a
+            // draft-07 $schema onto declared outputSchemas, which strict 2020-12-only clients
+            // reject client-side before the tool call ever reaches this server (see
+            // https://github.com/modelcontextprotocol/typescript-sdk/issues/2532). structuredContent
+            // below still drives the weather-app UI without needing a declared outputSchema.
+            // Links this tool's result to the weather-app UI resource registered below
+            _meta: {
+                ui: { resourceUri: WEATHER_RESOURCE_URI },
+                'ui/resourceUri': WEATHER_RESOURCE_URI
+            }
         },
         async ({ city = 'Unknown City' }) => {
             try {
@@ -120,51 +159,62 @@ function registerTools (server) {
                 // - WeatherAPI.com
                 // - AccuWeather API
                 //
-                // For now, we'll return realistic mock data with random variations
+                // For now, we'll return realistic mock data with random variations.
+                // Conditions are grouped by category so the UI can theme itself
+                // (sun / clouds / rain / snow) and temperature ranges stay coherent
+                // with the picked category.
+                const conditionsByCategory = {
+                    sunny: { conditions: ['Sunny', 'Clear'], tempRange: [18, 32] },
+                    cloudy: { conditions: ['Partly Cloudy', 'Cloudy', 'Overcast'], tempRange: [10, 22] },
+                    rain: { conditions: ['Light Rain', 'Scattered Showers', 'Drizzle', 'Heavy Rain', 'Thunderstorm'], tempRange: [4, 16] },
+                    snow: { conditions: ['Snow', 'Light Snow', 'Flurries', 'Heavy Snow'], tempRange: [-8, 3] }
+                }
 
-                // Generate realistic spring weather with random variations (always in Celsius)
-                const baseTemp = 18 // Spring baseline in Celsius
-                const tempVariation = (Math.random() - 0.5) * 20 // ±10 degrees variation
-                const temperature = Math.round((baseTemp + tempVariation) * 10) / 10
+                // Weighted so sun/clouds are most common, snow is rarest
+                const categoryRoll = Math.random()
+                const category = categoryRoll < 0.35 ? 'sunny'
+                    : categoryRoll < 0.65 ? 'cloudy'
+                        : categoryRoll < 0.90 ? 'rain'
+                            : 'snow'
 
-                const conditions = [
-                    'Sunny', 'Partly Cloudy', 'Cloudy', 'Light Rain',
-                    'Scattered Showers', 'Clear', 'Overcast', 'Drizzle'
-                ]
+                const { conditions, tempRange } = conditionsByCategory[category]
                 const currentCondition = conditions[Math.floor(Math.random() * conditions.length)]
+                const temperature = Math.round((tempRange[0] + Math.random() * (tempRange[1] - tempRange[0])) * 10) / 10
 
                 const humidity = Math.floor(Math.random() * 40) + 40 // 40-80%
                 const windSpeed = Math.floor(Math.random() * 15) + 5 // 5-20 km/h
                 const pressure = Math.floor(Math.random() * 30) + 1000 // 1000-1030 hPa
+                const visibility = Math.floor(Math.random() * 5) + 10 // 10-14 km
+                const uvIndex = Math.floor(Math.random() * 8) + 1 // 1-8
+                const lastUpdated = new Date().toISOString()
 
-                // Create realistic weather response
-                const weatherData = {
+                const structuredContent = {
                     city,
                     country: 'Sample Country', // In real API, this would come from the response
-                    current: {
-                        temperature,
-                        condition: currentCondition,
-                        humidity: `${humidity}%`,
-                        wind_speed: `${windSpeed} km/h`,
-                        pressure: `${pressure} hPa`,
-                        visibility: `${Math.floor(Math.random() * 5) + 10} km`,
-                        uv_index: Math.floor(Math.random() * 8) + 1
-                    },
-                    last_updated: new Date().toISOString(),
-                    source: 'Mock Weather Service (replace with real API)'
+                    category,
+                    condition: currentCondition,
+                    temperature,
+                    humidity,
+                    windSpeed,
+                    pressure,
+                    visibility,
+                    uvIndex,
+                    lastUpdated
                 }
 
-                // Format response for display
-                let responseText = `🌤️ Weather for ${city}\n`
+                const categoryEmoji = { sunny: '☀️', cloudy: '☁️', rain: '🌧️', snow: '❄️' }[category]
+
+                // Format response for display (fallback for hosts without MCP App UI support)
+                let responseText = `${categoryEmoji} Weather for ${city}\n`
                 responseText += '⚠️ **EXAMPLE DATA - NOT REAL WEATHER** ⚠️\n\n'
                 responseText += `🌡️ Temperature: ${temperature}°C\n`
                 responseText += `☁️ Conditions: ${currentCondition}\n`
                 responseText += `💧 Humidity: ${humidity}%\n`
                 responseText += `💨 Wind: ${windSpeed} km/h\n`
                 responseText += `📊 Pressure: ${pressure} hPa\n`
-                responseText += `👁️ Visibility: ${weatherData.current.visibility}\n`
-                responseText += `☀️ UV Index: ${weatherData.current.uv_index}\n`
-                responseText += `\n⏰ Last Updated: ${new Date().toLocaleString()}`
+                responseText += `👁️ Visibility: ${visibility} km\n`
+                responseText += `☀️ UV Index: ${uvIndex}\n`
+                responseText += `\n⏰ Last Updated: ${new Date(lastUpdated).toLocaleString()}`
                 responseText += '\n\n💡 Note: This is mock/example data for demonstration purposes only. Replace with real weather API calls in production.'
 
                 return {
@@ -174,16 +224,11 @@ function registerTools (server) {
                             text: responseText
                         }
                     ],
-                    // Optional: Include structured data
-                    metadata: {
-                        source: 'mock-weather-service',
-                        city,
-                        timestamp: new Date().toISOString(),
-                        raw_data: weatherData
-                    }
+                    structuredContent
                 }
             } catch (error) {
                 return {
+                    isError: true,
                     content: [
                         {
                             type: 'text',
@@ -320,6 +365,25 @@ CUSTOMIZE: Replace this with your actual API documentation, database schemas, or
         }
     )
 
+    // Weather MCP App UI - serves the bundled HTML/CSS/JS card that the
+    // `weather` tool links to via `_meta.ui.resourceUri` (see registerTools above).
+    server.registerResource(
+        WEATHER_RESOURCE_URI,
+        WEATHER_RESOURCE_URI,
+        { mimeType: WEATHER_RESOURCE_MIME_TYPE },
+        async () => {
+            const html = await loadUiHtml(path.join(__dirname, 'static', 'weather.html'), 'weatherHtml')
+            return {
+                contents: [
+                    {
+                        uri: WEATHER_RESOURCE_URI,
+                        mimeType: WEATHER_RESOURCE_MIME_TYPE,
+                        text: html
+                    }
+                ]
+            }
+        }
+    )
 
 }
 

@@ -20,6 +20,9 @@ Mathematical expression evaluation with configurable output formats (decimal, sc
 
 ### Weather Tool 
 Mock weather API demonstrating external service integration patterns. Ready for real API replacement.
+Also demonstrates MCP App UI: the result links to a `ui://weather/mcp-app.html` resource so
+MCP Apps-capable hosts render a themed, animated weather card instead of plain text (see
+`actions/mcp-server/app-ui/src/weather/`).
 
 ## 📚 Resources & Prompts
 
@@ -40,7 +43,10 @@ Mock weather API demonstrating external service integration patterns. Ready for 
 your-mcp-server/
 ├── actions/mcp-server/
 │   ├── index.js          # Main MCP server (SDK-powered)
-│   └── tools.js          # Tool definitions  
+│   ├── tools.js          # Tool definitions
+│   ├── app-ui/src/       # MCP App UI source (HTML/CSS/TS, built with Vite)
+│   └── static/           # Built UI HTML (generated, gitignored)
+├── scripts/              # build-ui.js / embed-ui.js (UI build pipeline)
 ├── test/                 # Jest test suite
 ├── app.config.yaml       # I/O Runtime config
 ├── package.json          # Dependencies (includes MCP SDK)
@@ -53,6 +59,7 @@ your-mcp-server/
 npm install         # Install dependencies  
 npm run dev         # Local development
 npm test           # Run tests
+npm run build      # Build UI + bundle (build:ui, embed:ui, webpack)
 npm run deploy     # Deploy to I/O Runtime
 ```
 
@@ -63,6 +70,10 @@ npm run deploy     # Deploy to I/O Runtime
 **Adding Resources**: Use `server.resource()` for static content access
 
 **Adding Prompts**: Use `server.prompt()` for reusable templates
+
+**Adding a Tool UI**: Drop a new `app-ui/src/<name>/<name>.{html,ts,css}`, link a tool's result to
+it via `_meta.ui.resourceUri`, and register a matching resource - `npm run build:ui`/`embed:ui` pick
+it up automatically (see the `weather` tool for a working example)
 
 ## 🔐 Security & Performance
 

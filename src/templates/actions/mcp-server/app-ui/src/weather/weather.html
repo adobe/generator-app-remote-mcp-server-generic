@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>Weather</title>
+</head>
+<body>
+  <main class="main" id="main" data-category="loading">
+    <div class="weather-fx" id="fx" aria-hidden="true"></div>
+
+    <div class="search-row">
+      <input type="text" id="city-input" class="city-input" placeholder="Check another city…" aria-label="City name">
+      <button type="button" id="search-btn" class="btn-search">Search</button>
+    </div>
+
+    <section class="card" id="card" data-state="loading">
+      <header class="card-header">
+        <div class="location">
+          <h1 class="city-name" id="city-name">—</h1>
+          <p class="country-name" id="country-name"></p>
+        </div>
+
+        <div class="icon-wrap" id="icon-wrap">
+          <div class="icon icon-loading" aria-hidden="true">
+            <div class="loading-pulse"></div>
+          </div>
+          <div class="icon icon-sun" aria-hidden="true">
+            <div class="sun-rays">
+              <span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span>
+            </div>
+            <div class="sun-core"></div>
+          </div>
+          <div class="icon icon-cloud" aria-hidden="true">
+            <div class="cloud cloud-back"></div>
+            <div class="cloud cloud-front"></div>
+          </div>
+          <div class="icon icon-rain" aria-hidden="true">
+            <div class="cloud cloud-rain"></div>
+            <div class="icon-drops">
+              <span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+          <div class="icon icon-snow" aria-hidden="true">
+            <div class="cloud cloud-snow"></div>
+            <div class="icon-flakes">
+              <span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="temp-row">
+        <span class="temperature" id="temperature">--°</span>
+        <span class="condition" id="condition">—</span>
+      </div>
+
+      <dl class="details-grid" id="details-grid">
+        <div class="detail">
+          <dt>Humidity</dt>
+          <dd id="detail-humidity">—</dd>
+        </div>
+        <div class="detail">
+          <dt>Wind</dt>
+          <dd id="detail-wind">—</dd>
+        </div>
+        <div class="detail">
+          <dt>Pressure</dt>
+          <dd id="detail-pressure">—</dd>
+        </div>
+        <div class="detail">
+          <dt>Visibility</dt>
+          <dd id="detail-visibility">—</dd>
+        </div>
+        <div class="detail">
+          <dt>UV Index</dt>
+          <dd id="detail-uv">—</dd>
+        </div>
+      </dl>
+
+      <p class="updated" id="updated"></p>
+    </section>
+
+    <p class="error-message" id="error-message" hidden></p>
+  </main>
+  <script type="module" src="./weather.ts"></script>
+</body>
+</html>

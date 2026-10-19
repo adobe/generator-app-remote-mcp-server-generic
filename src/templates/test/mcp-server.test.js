@@ -239,8 +239,9 @@ describe('MCP Server Template Tests', () => {
             expect(body.result.content[0].text).toContain('Humidity:')
             expect(body.result.content[0].text).toContain('Wind:')
             expect(body.result.content[0].text).not.toContain('Forecast')
-            expect(body.result.metadata).toBeDefined()
-            expect(body.result.metadata.city).toBe('San Francisco')
+            expect(body.result.structuredContent).toBeDefined()
+            expect(body.result.structuredContent.city).toBe('San Francisco')
+            expect(['sunny', 'cloudy', 'rain', 'snow']).toContain(body.result.structuredContent.category)
         })
 
         test('should handle resources/list request', async () => {

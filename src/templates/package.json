@@ -6,7 +6,9 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "build": "webpack",
+    "build": "npm run build:ui && npm run embed:ui && webpack",
+    "build:ui": "node scripts/build-ui.js",
+    "embed:ui": "node scripts/embed-ui.js",
     "deploy": "npm run build && aio app deploy",
     "undeploy": "aio app undeploy",
     "dev": "aio app run",
@@ -16,6 +18,7 @@
   },
   "dependencies": {
     "@adobe/aio-sdk": "^5.0.0",
+    "@modelcontextprotocol/ext-apps": "^1.7.5",
     "@modelcontextprotocol/sdk": "^1.24.0",
     "zod": "^3.23.8"
   },
@@ -28,6 +31,9 @@
     "webpack-cli": "^5.1.4",
     "eslint": "^8.57.0",
     "prettier": "^3.0.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.1.5",
+    "vite-plugin-singlefile": "^2.3.3",
     "@adobe/generator-app-remote-mcp-server-generic": "^0.1.8"
   },
   "keywords": [
