@@ -47,16 +47,12 @@ global.createMockI18nParams = (body, method = 'post') => ({
     LOG_LEVEL: 'info'
 })
 
-// Mock Adobe I/O SDK Core Logger if needed
-jest.mock('@adobe/aio-sdk', () => ({
-    Core: {
-        Logger: jest.fn().mockReturnValue({
-            info: jest.fn(),
-            debug: jest.fn(),
-            warn: jest.fn(),
-            error: jest.fn()
-        })
-    }
+// Mock the Adobe I/O logger to keep request tests independent of logging transports
+jest.mock('@adobe/aio-lib-core-logging', () => jest.fn().mockReturnValue({
+    info: jest.fn(),
+    debug: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn()
 }))
 
 // Add any additional global setup here

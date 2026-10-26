@@ -6,15 +6,29 @@ This Project is generated using https://github.com/OneAdobe/app-builder-remote-m
 
 ## Development checks
 
+Use Node.js 20.19+, 22.13+, or 24+ for local development. The deployment target
+remains Adobe I/O Runtime Node.js 20.
+
 ```bash
 npm run lint -- --max-warnings 0
 npm test
 npm run build
+npx --no-install tsc --project actions/mcp-server/app-ui/tsconfig.json --noEmit
 ```
 
 Unknown tool calls return an MCP tool result with `isError: true` and explanatory text,
 not a top-level JSON-RPC error. The tests also mock IMS responses to validate
 authentication logging without making network requests.
+
+The generated app uses ESLint 10 with `eslint.config.js` and Jest 30. Adobe logging
+is provided by `@adobe/aio-lib-core-logging`; install any additional Adobe SDK
+libraries explicitly if your custom actions need them. The generator itself is
+only needed during scaffolding and is not a dependency of the generated app.
+
+TypeScript 6 matches the ESLint Jest plugin's supported peer range. A scoped
+`babel-plugin-istanbul` override uses `test-exclude` 8 to avoid its older deprecated
+`glob` dependency; remove the override once the coverage plugin adopts that version.
+It keeps the same exclusion implementation and requires the Node versions listed above.
 
 ## Authentication
 

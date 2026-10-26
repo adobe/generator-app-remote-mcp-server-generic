@@ -20,7 +20,7 @@ governing permissions and limitations under the License.
 // Must run before @modelcontextprotocol/sdk imports (SDK 1.24+ uses global File at load time).
 require('./node18-web-globals.js')
 
-const { Core } = require('@adobe/aio-sdk')
+const Logger = require('@adobe/aio-lib-core-logging')
 const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js')
 const { StreamableHTTPServerTransport } = require('@modelcontextprotocol/sdk/server/streamableHttp.js')
 const { registerTools, registerResources, registerPrompts } = require('./tools.js')
@@ -34,7 +34,7 @@ function getWebStandardTransport () {
  try {
   const web = require('@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js')
   _webStandardTransport = web.WebStandardStreamableHTTPServerTransport
- } catch (_) {
+ } catch {
   _webStandardTransport = null
  }
  return _webStandardTransport
@@ -86,7 +86,7 @@ function parseRequestBody (params) {
             try {
                 const decoded = Buffer.from(params.__ow_body, 'base64').toString('utf8')
                 return JSON.parse(decoded)
-            } catch (e) {
+            } catch {
                 return JSON.parse(params.__ow_body)
             }
         } else {
@@ -94,7 +94,7 @@ function parseRequestBody (params) {
         }
     } catch (error) {
         logger?.error('Failed to parse request body:', error)
-        throw new Error(`Failed to parse request body: ${error.message}`)
+        throw new Error(`Failed to parse request body: ${error.message}`, { cause: error })
     }
 }
 
@@ -433,7 +433,7 @@ async function main (params) {
 
         // Initialize logger
         try {
-            logger = Core.Logger('<%= projectName %>', { level: params.LOG_LEVEL || 'info' })
+            logger = Logger('<%= projectName %>', { level: params.LOG_LEVEL || 'info' })
         } catch (loggerError) {
             console.error('Logger creation error:', loggerError)
             return {

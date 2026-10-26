@@ -18,7 +18,7 @@ const webStandardModule = '@modelcontextprotocol/sdk/server/webStandardStreamabl
 let externals = []
 try {
   require.resolve(webStandardModule)
-} catch (_) {
+} catch {
   externals = [webStandardModule]
 }
 
