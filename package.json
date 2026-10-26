@@ -1,6 +1,6 @@
 {
   "name": "@adobe/generator-app-remote-mcp-server-generic",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Adobe I/O Appbuilder template for MCP server implementation with Appbuilder action.",
   "main": "src/index.js",
   "engines": {
