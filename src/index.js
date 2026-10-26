@@ -198,7 +198,7 @@ class McpIoRuntimeGenerator extends ActionGenerator {
       'TEMPLATE-FEATURES.md',
       'webpack.config.js',
       'jest.config.js',
-      '.eslintrc.js',
+      'eslint.config.js',
       '.babelrc',
       'actions/mcp-server/index.js',
       'actions/mcp-server/node18-web-globals.js',

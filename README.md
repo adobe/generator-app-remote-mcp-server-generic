@@ -38,7 +38,7 @@ Generate **MCP servers** that run on Adobe I/O Runtime. Connect AI assistants li
 ## Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
+- Node.js 20.19+, 22.13+, or 24+ for generated-app development (Adobe I/O Runtime target: Node.js 20)
 - Adobe I/O CLI: `npm install -g @adobe/aio-cli`
 - Adobe Developer Console project with I/O Runtime enabled
 

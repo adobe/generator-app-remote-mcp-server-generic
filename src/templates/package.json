@@ -17,24 +17,27 @@
     "format": "prettier --write actions/"
   },
   "dependencies": {
-    "@adobe/aio-sdk": "^5.0.0",
+    "@adobe/aio-lib-core-logging": "^3.0.2",
     "@modelcontextprotocol/ext-apps": "^1.7.5",
-    "@modelcontextprotocol/sdk": "^1.24.0",
-    "zod": "^3.23.8"
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
-    "jest": "^29.0.0",
+    "jest": "^30.5.2",
+    "babel-jest": "^30.5.2",
     "@babel/core": "^7.26.10",
     "@babel/preset-env": "^7.26.9",
     "babel-loader": "^9.2.1",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4",
-    "eslint": "^8.57.0",
+    "eslint": "^10.13.0",
+    "@eslint/js": "^10.0.1",
+    "eslint-plugin-jest": "^29.17.0",
+    "globals": "^17.13.0",
     "prettier": "^3.0.0",
-    "typescript": "^7.0.2",
+    "typescript": "^6.0.3",
     "vite": "^8.1.5",
-    "vite-plugin-singlefile": "^2.3.3",
-    "@adobe/generator-app-remote-mcp-server-generic": "^0.1.8"
+    "vite-plugin-singlefile": "^2.3.3"
   },
   "keywords": [
     "adobe-io",
@@ -45,7 +48,12 @@
     "i/o-runtime"
   ],
   "engines": {
-    "node": ">=18.19.0"
+    "node": "^20.19.0 || ^22.13.0 || >=24.0.0"
+  },
+  "overrides": {
+    "babel-plugin-istanbul": {
+      "test-exclude": "^8.0.0"
+    }
   },
   "repository": {
     "type": "git",

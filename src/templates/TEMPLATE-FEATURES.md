@@ -32,9 +32,9 @@ MCP Apps-capable hosts render a themed, animated weather card instead of plain t
 
 ## 🚀 Development Stack
 
-- **Build**: Webpack + Babel for Node.js 18+ 
-- **Testing**: Jest with full coverage and Adobe I/O mocks
-- **Quality**: ESLint + Prettier with security rules
+- **Build**: Webpack + Babel; local development on Node.js 20.19+, 22.13+, or 24+
+- **Testing**: Jest 30 with coverage and mocked Adobe logging
+- **Quality**: ESLint 10 flat configuration + Prettier
 - **Deployment**: Adobe I/O CLI integration
 
 ## 📁 Project Structure
