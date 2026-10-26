@@ -4,6 +4,18 @@ Create [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) servers 
 
 This Project is generated using https://github.com/OneAdobe/app-builder-remote-mcp-server-starter template.
 
+## Development checks
+
+```bash
+npm run lint -- --max-warnings 0
+npm test
+npm run build
+```
+
+Unknown tool calls return an MCP tool result with `isError: true` and explanatory text,
+not a top-level JSON-RPC error. The tests also mock IMS responses to validate
+authentication logging without making network requests.
+
 ## Authentication
 
 The MCP server supports two authentication modes to secure your endpoints:

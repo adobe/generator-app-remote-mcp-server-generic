@@ -18,6 +18,7 @@ governing permissions and limitations under the License.
  */
 
 const { main } = require('../actions/mcp-server/index.js')
+const { validateTokenWithIms } = require('../actions/mcp-server/validator.js')
 
 describe('MCP Server Template Tests', () => {
     // Test server health check
@@ -335,7 +336,15 @@ describe('MCP Server Template Tests', () => {
 
             const body = JSON.parse(result.body)
             expect(body.jsonrpc).toBe('2.0')
-            expect(body.error.code).toBe(-32602) // Invalid params - this is what the MCP SDK returns for unknown tools
+            expect(body.id).toBe(toolCallRequest.id)
+            expect(body.error).toBeUndefined()
+            expect(body.result.isError).toBe(true)
+            expect(body.result.content).toEqual([
+                {
+                    type: 'text',
+                    text: expect.stringContaining('nonexistent_tool')
+                }
+            ])
         })
 
         test('should handle unsupported HTTP method', async () => {
@@ -347,6 +356,70 @@ describe('MCP Server Template Tests', () => {
             const result = await main(params)
 
             expect(result.statusCode).toBe(405)
+        })
+    })
+
+    describe('IMS token validation', () => {
+        afterEach(() => {
+            jest.restoreAllMocks()
+        })
+
+        test('logs successful validation and returns user information', async () => {
+            const userInfo = { sub: 'test-user' }
+            jest.spyOn(global, 'fetch').mockResolvedValue({
+                ok: true,
+                status: 200,
+                json: jest.fn().mockResolvedValue(userInfo)
+            })
+            const logger = { info: jest.fn() }
+
+            await expect(validateTokenWithIms('test-token', logger)).resolves.toEqual({
+                valid: true,
+                userInfo
+            })
+            expect(logger.info).toHaveBeenCalledWith('[auth] IMS token valid', { status: 200 })
+        })
+
+        test('logs rejected tokens and returns an authentication error', async () => {
+            jest.spyOn(global, 'fetch').mockResolvedValue({
+                ok: false,
+                status: 401,
+                text: jest.fn().mockResolvedValue('Unauthorized')
+            })
+            const logger = { warn: jest.fn() }
+
+            await expect(validateTokenWithIms('test-token', logger)).resolves.toEqual({
+                valid: false,
+                error: 'Invalid or expired token'
+            })
+            expect(logger.warn).toHaveBeenCalledWith('[auth] IMS userinfo rejected token', {
+                status: 401,
+                body: 'Unauthorized'
+            })
+        })
+
+        test('logs network failures and returns a validation-unavailable error', async () => {
+            jest.spyOn(global, 'fetch').mockRejectedValue(new Error('Network unavailable'))
+            const logger = { warn: jest.fn() }
+
+            await expect(validateTokenWithIms('test-token', logger)).resolves.toEqual({
+                valid: false,
+                error: 'Token validation unavailable'
+            })
+            expect(logger.warn).toHaveBeenCalledWith('[auth] IMS userinfo request failed', 'Network unavailable')
+        })
+
+        test('supports loggers without optional logging methods', async () => {
+            jest.spyOn(global, 'fetch').mockResolvedValue({
+                ok: true,
+                status: 200,
+                json: jest.fn().mockResolvedValue({ sub: 'test-user' })
+            })
+
+            await expect(validateTokenWithIms('test-token', {})).resolves.toEqual({
+                valid: true,
+                userInfo: { sub: 'test-user' }
+            })
         })
     })
 })

@@ -276,12 +276,12 @@ function createCompatibleResponse () {
         flushHeaders: () => { headersSent = true },
 
         // Event emitter (minimal implementation)
-        on: (event, handler) => { return res },
-        once: (event, handler) => { return res },
-        emit: (event, ...args) => { return true },
+        on: () => { return res },
+        once: () => { return res },
+        emit: () => { return true },
         removeListener: () => { return res },
-        addListener: (event, handler) => { return res },
-        off: (event, handler) => { return res },
+        addListener: () => { return res },
+        off: () => { return res },
 
         // Get result for Adobe I/O Runtime
         getResult: () => {
@@ -504,7 +504,7 @@ async function main (params) {
             logger.info('CORS preflight request')
             return handleOptionsRequest()
 
-        case 'post':
+        case 'post': {
             logger.info('MCP protocol request - validating authentication')
             
             // Validate authentication if configured (only for POST requests)
@@ -535,6 +535,7 @@ async function main (params) {
             
             logger.info('Authentication passed - delegating to SDK')
             return await handleMcpRequest(params)
+        }
 
         default:
             logger.warn(`Method not allowed: ${params.__ow_method}`)

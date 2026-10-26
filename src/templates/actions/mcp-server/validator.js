@@ -62,17 +62,17 @@ async function validateTokenWithIms(token, logger = console) {
     });
     if (res.ok) {
       const userInfo = await res.json().catch(() => ({}));
-      try { logger.info("[auth] IMS token valid", { status: res.status }); } catch {}
+      logger.info?.("[auth] IMS token valid", { status: res.status });
       return { valid: true, userInfo };
     }
     const text = await res.text().catch(() => "");
-    try { logger.warn("[auth] IMS userinfo rejected token", { status: res.status, body: text.slice(0, 200) }); } catch {}
+    logger.warn?.("[auth] IMS userinfo rejected token", { status: res.status, body: text.slice(0, 200) });
     return {
       valid: false,
       error: res.status === 401 ? "Invalid or expired token" : `Token validation failed (${res.status})`,
     };
   } catch (e) {
-    try { logger.warn("[auth] IMS userinfo request failed", e?.message || e); } catch {}
+    logger.warn?.("[auth] IMS userinfo request failed", e?.message || e);
     return { valid: false, error: "Token validation unavailable" };
   }
 }
